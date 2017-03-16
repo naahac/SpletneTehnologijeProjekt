@@ -24,7 +24,7 @@ function Testing(){
     console.log(a);
 }
 
-module.exports = {Person, User, Author, Testing };
+module.exports = {Person, User, Author, Book, Listing, Chat, Message, Picture, Token, Genre, UserLikesGenre, UserLikesAuthor, UserLikesBook, SearchParameters, Testing };
 
 
   

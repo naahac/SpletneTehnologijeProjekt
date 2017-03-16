@@ -7,4 +7,4 @@ class Picture {
   }
 }
 
-module.exports = Message;
+module.exports = Picture;
