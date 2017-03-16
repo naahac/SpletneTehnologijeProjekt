@@ -19,6 +19,9 @@ function Testing(){
 
     var u = new User(1, "Samo", "Taciga", "19.8.1993", "Maribor");
     console.log(u);
+
+    var a = new Author(1, "Samo", "Taciga", "19.8.1993", "Samo");
+    console.log(a);
 }
 
 module.exports = {Person, User, Author, Testing };
