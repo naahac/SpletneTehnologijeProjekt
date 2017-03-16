@@ -1,8 +1,8 @@
 var Person = require('./person.js')
 
 class Author extends Person {
-    constructor(personId, name, surname, birthDate, pseudonym){
-        super(personId, name, surname, birthDate);
+    constructor(personID, name, surname, birthDate, pseudonym){
+        super(personID, name, surname, birthDate);
         this.pseudonym = pseudonym;
     }
 }
