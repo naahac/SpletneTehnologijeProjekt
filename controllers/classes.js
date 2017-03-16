@@ -24,7 +24,11 @@ function Testing(){
     console.log(a);
 }
 
-module.exports = {Person, User, Author, Book, Listing, Chat, Message, Picture, Token, Genre, UserLikesGenre, UserLikesAuthor, UserLikesBook, SearchParameters, Testing };
+function checkUser(tokenId, res){
+    if(!Token.checkUser(tokenId)){
+        res.status(404);
+        res.send("You don't have authorization for this action!");
+    }
+}
 
-
-  
+module.exports = {Person, User, Author, Book, Listing, Chat, Message, Picture, Token, Genre, UserLikesGenre, UserLikesAuthor, UserLikesBook, SearchParameters, Testing, checkUser };

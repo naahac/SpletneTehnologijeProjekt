@@ -5,23 +5,29 @@ var users = []
 var usersId = 1;
 
 class User extends Person {
-    constructor(personID, name, surname, birthDate, username, password, email, location){
-        super(personID, name, surname, birthDate);
+    constructor(personId, name, surname, birthDate, username, password, email, location){
+        super(personId, name, surname, birthDate);
         this.location = location;
-
+        this.username = username;
+        this.password = password;
+        this.email = email;
     }
 
-    static getUserById(personID) {
-        return users.find(function(value){ return value.personID==personID;});
+    static getUserById(personId) {
+        return users.find(function(value){ return value.personId==personId;});
     }
 
-    static updateUser(personID, name, surname, birthDate, username, password, email, location){
-        var index = users.indexOf(this.getUserById(personID));
-        users[index] =  new User(personID, name, surname, birthDate, username, password, email, location);
+    static getUsers() {
+        return users;
     }
 
-    static deleteUser(personID) {
-        var index = users.indexOf(this.getUserById(personID));
+    static updateUser(personId, name, surname, birthDate, username, password, email, location){
+        var index = users.indexOf(this.getUserById(personId));
+        users[index] =  new User(personId, name, surname, birthDate, username, password, email, location);
+    }
+
+    static deleteUser(personId) {
+        var index = users.indexOf(this.getUserById(personId));
         if (index > -1) {
             users.splice(index, 1);
         }
@@ -32,23 +38,27 @@ class User extends Person {
     }
 
     static login(username, password){
-        var user = users.find(function(value){ return o.username==username && o.password == password;});
+        var user = users.find(function(o){ return o.username==username && o.password == password;});
 
         if(user!=undefined){
-            var token = Token.getActiveTokenByUserId(user.personID);
+            var token = Token.getActiveTokenByUserId(user.personId);
 
-            if(token==undefined)
-                token = Token.createToken(user.personID);
+            if(token==-1){
+                token = Token.createToken(user.personId);
+                return token;
+            }
 
-            return token.tokenID;
+            return token.tokenId;
         }
+
+        return -1;
     }
 
-  static logout(tokenID){
-      Token.changeStatus(tokenID);
+  static logout(tokenId){
+      Token.changeStatus(tokenId);
   }
 }
 
-users.push(new User(usersId++,"Ime","Priimek","8.3.1992","Maribor"));
+users.push(new User(usersId++,"Ime","Priimek","8.3.1992", "test", "test", "test@test.com", "Maribor"));
 
 module.exports = User;
