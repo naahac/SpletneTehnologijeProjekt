@@ -4,8 +4,8 @@ var users = []
 var usersId = 1;
 
 class User extends Person {
-    constructor(personId, name, surname, birthDate, location){
-        super(personId, name, surname, birthDate);
+    constructor(personID, name, surname, birthDate, location){
+        super(personID, name, surname, birthDate);
         this.location = location;
     }
 
@@ -13,8 +13,13 @@ class User extends Person {
         users.push(new User(usersId++,name,surname,birthDate,location))
     }
 
-    static getUserById(personId) {
-        return users.find(o => o.personId === personId);
+    static getUserById(personID) {
+        return users.find(function(value){ return value.personID==personID;});
+    }
+
+    static updateUser(personID, name, surname, birthDate, location){
+        var index = users.indexOf(this.getUserById(personID));
+        users[index] =  new User(personID,name,surname,birthDate,location);
     }
 
     static deleteUser(personID) {
@@ -25,4 +30,6 @@ class User extends Person {
     }
 }
 
-module.exports = User;
+users.push(new User(usersId++,"Ime","Priimek","8.3.1992","Maribor"));
+
+module.exports = User, users;
