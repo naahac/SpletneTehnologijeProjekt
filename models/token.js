@@ -14,19 +14,15 @@ class Token {
     return tokenID;
   }
 
-  static login(username, password){
-
-  }
-
-  static logoff(tokenID){
-
-  }
-
   static changeStatus(TokenID){
     var token = tokens.find(o => o.tokenID === tokenID);
     var index = tokens.indexOf(token);
     tokens[index].active = false;
   }
+
+  static getActiveTokenByUserId(personID) {
+        return tokens.find(function(o){ return o.userID==userID && o.active==true;});
+    }
 
   S4() {
     return (((1+Math.random())*0x10000)|0).toString(16).substring(1); 
