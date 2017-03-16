@@ -1,6 +1,6 @@
 class Person { 
-  constructor(personID, name, surname, birthDate) {
-    this.personID = personID;
+  constructor(personId, name, surname, birthDate) {
+    this.personId = personId;
     this.name = name;
     this.surname = surname;
     this.birthDate = birthDate;
