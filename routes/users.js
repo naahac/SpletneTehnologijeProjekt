@@ -25,7 +25,12 @@ router.put('/', function(req, res, next){
 });
 
 router.post('/', function(req, res, next){
-    classes.User.insertUser(req.body.name, req.body.surname, req.body.birthDate, req.body.location)
+    classes.User.createUser(req.body.name, req.body.surname, req.body.birthDate, req.body.location)
+    res.send('OK');
+});
+
+router.delete('/:id', function(req, res, next){
+    classes.User.deleteUser(req.params.id)
     res.send('OK');
 });
 
