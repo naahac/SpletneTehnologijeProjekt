@@ -35,10 +35,10 @@ router.post('/', function(req, res, next){
     res.send('OK');
 });
 
-router.delete('/:id', function(req, res, next){
+router.delete('/', function(req, res, next){
     classes.checkUser(req.body.tokenId, res);
     
-    classes.User.deleteUser(req.params.id)
+    classes.User.deleteUser(req.body.listingId)
     res.send('OK');
 });
 

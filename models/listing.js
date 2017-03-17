@@ -20,6 +20,10 @@ class Listing {
     return listings;
   }
 
+  static createAuthor(title, description, dateadded, status, userId, bookId){
+        listings.push(new Listing(listingsId++, title, description, dateadded, status, userId, bookId))
+    }
+
   static updateListing(listingId, title, releasedate, authorId){
     var index = users.indexOf(this.getUserById(listingId));
     users[index] =  new User(listingId, title, releasedate, authorId);

@@ -44,6 +44,15 @@ class Token {
     return token;
   }
 
+  static getUserIdByTokenId(tokenId) {
+    var token = tokens.find(function(o){ return o.tokenId==tokenId && o.active==true;});
+       
+    if(token==undefined)
+      token = -1;
+
+    return token.userId;
+  }
+
   static S4() {
     return (((1+Math.random())*0x10000)|0).toString(16).substring(1); 
   }

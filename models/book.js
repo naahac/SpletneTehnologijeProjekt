@@ -17,6 +17,10 @@ class Book {
     return books;
   }
 
+  static createBook(title, releasedate, authorId){
+        books.push(new Book(booksId++, title, releasedate, authorId))
+    }
+
   static updateBook(bookId, title, releasedate, authorId){
     var index = users.indexOf(this.getUserById(bookId));
     users[index] =  new User(bookId, title, releasedate, authorId);
