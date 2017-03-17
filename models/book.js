@@ -1,3 +1,5 @@
+var Author = require('./author')
+
 var books = []
 var booksId = 1;
 
@@ -18,7 +20,11 @@ class Book {
   }
 
   static createBook(title, releasedate, authorId){
-        books.push(new Book(booksId++, title, releasedate, authorId))
+      if(Author.getAuthorById(authorId) == undefined)
+      return false;
+
+      books.push(new Book(booksId++, title, releasedate, authorId))
+      return false;
     }
 
   static updateBook(bookId, title, releasedate, authorId){

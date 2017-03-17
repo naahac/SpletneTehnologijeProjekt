@@ -18,8 +18,11 @@ router.get('/books', function(req, res, next) {
 router.post('/books', function(req, res, next){
     classes.checkUser(req.body.tokenId, res);
 
-    classes.UserLikesBook.likeBook(req.body.tokenId, req.body.bookId)
-    res.send('OK');
+    if(classes.UserLikesBook.likeBook(req.body.tokenId, req.body.bookId))
+        res.send('OK');
+    
+    res.status(404);
+    res.send("Not valid dependencies!");
 });
 
 router.delete('/books', function(req, res, next){
@@ -44,8 +47,11 @@ router.get('/author', function(req, res, next) {
 router.post('/author', function(req, res, next){
     classes.checkUser(req.body.tokenId, res);
 
-    classes.UserLikesAuthor.likeAuthor(req.body.tokenId, req.body.authorId)
-    res.send('OK');
+    if(classes.UserLikesAuthor.likeAuthor(req.body.tokenId, req.body.authorId))
+        res.send('OK');
+    
+    res.status(404);
+    res.send("Not valid dependencies!");
 });
 
 router.delete('/author', function(req, res, next){
@@ -70,8 +76,11 @@ router.get('/genre', function(req, res, next) {
 router.post('/genre', function(req, res, next){
     classes.checkUser(req.body.tokenId, res);
 
-    classes.UserLikesGenre.likeGenre(req.body.tokenId, req.body.genreId)
-    res.send('OK');
+    if(classes.UserLikesGenre.likeGenre(req.body.tokenId, req.body.genreId))
+        res.send('OK');
+    
+    res.status(404);
+    res.send("Not valid dependencies!");
 });
 
 router.delete('/genre', function(req, res, next){

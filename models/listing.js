@@ -1,3 +1,6 @@
+var Book = require('./book');
+var User = require('./user')
+
 var listings = []
 var listingsId = 1;
 
@@ -20,9 +23,16 @@ class Listing {
     return listings;
   }
 
-  static createAuthor(title, description, dateadded, status, userId, bookId){
-        listings.push(new Listing(listingsId++, title, description, dateadded, status, userId, bookId))
-    }
+  static createListing(title, description, dateadded, status, userId, bookId){
+    if(User.getUserById(userId) == undefined)
+      return false;
+
+    if(Book.getBookById(bookId) == undefined)
+      return false;
+
+    listings.push(new Listing(listingsId++, title, description, dateadded, status, userId, bookId))
+    return true;
+  }
 
   static updateListing(listingId, title, releasedate, authorId){
     var index = users.indexOf(this.getUserById(listingId));

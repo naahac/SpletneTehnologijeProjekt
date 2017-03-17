@@ -6,26 +6,13 @@ var classes = require("./../controllers/classes");
 router.get('/', function(req, res, next) {
     classes.checkUser(req.query.tokenId, res);
 
-    res.json(classes.Listing.getListings());
-});
-
-router.get('/', function(req, res, next) {
-    classes.checkUser(req.query.tokenId, res);
-
-    var user = classes.Listing.getListingById(req.body.listingId);
-    if(user === undefined){
+    var pictures = classes.Picture.getPicturesByListingId(req.body.listingId);
+    if(pictures === undefined){
             res.status(404)
             res.send("User not found");
         }else {
-            res.json(user);
+            res.json(pictures);
         }
-});
-
-router.put('/', function(req, res, next){
-    classes.checkUser(req.body.tokenId, res);
-
-    classes.Listing.updateListing(req.body.listingId, req.body.title, req.body.releaseDate, req.body.authorId);
-    res.send('OK');
 });
 
 router.post('/', function(req, res, next){
@@ -38,7 +25,7 @@ router.post('/', function(req, res, next){
 router.delete('/', function(req, res, next){
     classes.checkUser(req.body.tokenId, res);
     
-    classes.User.deleteListing(req.body.listingId)
+    classes.Picture.deletePicture(req.body.pictureId)
     res.send('OK');
 });
 

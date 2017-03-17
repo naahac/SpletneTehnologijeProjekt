@@ -1,4 +1,3 @@
-
 class SearchParameters { 
   constructor(query, token) {
     this.query = query;

@@ -1,4 +1,5 @@
-var User = require('./user')
+var User = require('./user');
+var Author = require('./author.js');
 
 var userLikesAuthors = []
 var userLikesAuthorsId = 1;
@@ -14,12 +15,25 @@ class UserLikesAuthor {
     return userLikesAuthors.filter(function(o){ return o.userId==User.getUserIdByTokenId(tokenId);});
   }
 
-  static likeAuthor(tokenId, authorId){
-    userLikesAuthors.push(new UserLikesAuthor(userLikesAuthorsId++, User.getUserIdByTokenId(tokenId), authorId));
+  static getAuthor(tokenId, authorId){
+    return userLikesAuthors.filter(function(o){ return o.userId==User.getUserIdByTokenId(tokenId) && o.authorId==authorId;});
   }
 
+  static likeAuthor(tokenId, authorId){
+    if(User.getUserById(userId) == undefined)
+      return false;
+
+    if(Author.getAuthorById(authorId) == undefined)
+      return false;
+
+    var item = Author.getAuthor(tokenId, authorId);
+    if(item==undefined)
+      userLikesAuthors.push(new UserLikesAuthor(userLikesAuthorsId++, User.getUserIdByTokenId(tokenId), authorId));
+    return true;
+}
+
   static unlikeAuthor(tokenId, authorId){
-    var item = userLikesAuthors.find(function(o){ return o.userId==User.getUserIdByTokenId(tokenId) && o.authorId==authorId;});
+    var item = Author.getAuthor(tokenId, authorId);
     var index = users.indexOf(item);
         if (index > -1) {
             users.splice(index, 1);

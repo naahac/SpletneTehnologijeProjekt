@@ -9,10 +9,10 @@ router.get('/', function(req, res, next) {
     res.json(classes.User.getUsers());
 });
 
-router.get('/:id', function(req, res, next) {
+router.get('/', function(req, res, next) {
     classes.checkUser(req.query.tokenId, res);
 
-    var user = classes.User.getUserById(req.params.id);
+    var user = classes.User.getUserByTokenId(req.query.tokenId);
     if(user === undefined){
             res.status(404)
             res.send("User not found");

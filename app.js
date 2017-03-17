@@ -10,6 +10,7 @@ var users = require('./routes/users');
 var books = require('./routes/books');
 var listings = require('./routes/listings');
 var userPreferences = require('./routes/userPreferences');
+var pictures = require('./routes/pictures');
 
 var classes = require('./controllers/classes')
 // classes.Testing();
@@ -33,6 +34,7 @@ app.use('/users', users);
 app.use('/books', books);
 app.use('/listings', listings);
 app.use('/userpreferences', userPreferences);
+app.use('/pictures', pictures);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -17,6 +17,10 @@ class User extends Person {
         return users.find(function(o){ return o.personId==personId;});
     }
 
+    static getUserByTokenId(tokenId) {
+        return users.find(function(o){ return o.personId==Token.getUserIdByTokenId(tokenId);});
+    }
+
     static getUserIdByTokenId(tokenId) {
         return users.find(function(o){ return o.personId==Token.getUserIdByTokenId(tokenId);}).personId;
     }

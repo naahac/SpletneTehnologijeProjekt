@@ -1,3 +1,5 @@
+var User = require('./user')
+
 var tokens = []
 
 class Token { 
@@ -9,6 +11,9 @@ class Token {
   }
 
   static createToken(userId){
+    if(User.getUserById(userId) == undefined)
+      return false;
+
     var tokenId = this.CreateGUID();
     tokens.push(new Token(tokenId, Date.now(), true, userId));
     return tokenId;
