@@ -7,19 +7,35 @@ var bodyParser = require('body-parser');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
-var books = require('./routes/books');
-var listings = require('./routes/listings');
-var userPreferences = require('./routes/userPreferences');
-var pictures = require('./routes/pictures');
-
-var classes = require('./controllers/classes')
-// classes.Testing();
+// var books = require('./routes/books');
+// var listings = require('./routes/listings');
+// var userPreferences = require('./routes/userPreferences');
+// var pictures = require('./routes/pictures');
 
 var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
+
+app.use(function (req, res, next) {
+
+    // Website you wish to allow to connect
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8000');
+
+    // Request methods you wish to allow
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+    // Request headers you wish to allow
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+
+    // Set to true if you need the website to include cookies in the requests sent
+    // to the API (e.g. in case you use sessions)
+    res.setHeader('Access-Control-Allow-Credentials', true);
+
+    // Pass to next layer of middleware
+    next();
+});
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -31,10 +47,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/users', users);
-app.use('/books', books);
-app.use('/listings', listings);
-app.use('/userpreferences', userPreferences);
-app.use('/pictures', pictures);
+// app.use('/books', books);
+// app.use('/listings', listings);
+// app.use('/userpreferences', userPreferences);
+// app.use('/pictures', pictures);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

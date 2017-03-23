@@ -1,29 +1,30 @@
-var messages = []
-var messagesId = 1;
+var db = require('../database/database');
 
 class Message { 
-  constructor(messageID, text, datetime, chatID, userID) {
-    this.messageID = messageID;
+  constructor(messageId, text, datetime, chatId, userId) {
+    this.messageId = messageId;
     this.text = text;
     this.datetime = datetime;
-    this.chatID = chatID;
-    this.userID = userID;
+    this.chatId = chatId;
+    this.userId = userId;
   }
 
   static getMessageById(messageId) {
-    return messages.find(function(o){ return o.messageId==messageId;});
+    return db.messages.find(function(o){ return o.messageId==messageId;});
   }
 
-  static createMessage(message, dateadded, listingID){
-        messages.push(new Message(messagesId++, message, dateadded, listingID))
+  static createMessage(message, text, datetime, chatId, userId){
+        db.messages.push(new Message(messagesId++, text, datetime, chatId, userId))
     }
 
   static deleteMessage(messageId) {
-    var index = users.indexOf(this.getMessageById(messageId));
+    var index = db.messages.indexOf(this.getMessageById(messageId));
     if (index > -1) {
-        users.splice(index, 1);
+        db.messages.splice(index, 1);
     }
   }
 }
+
+var messagesId = 1;
 
 module.exports = Message;

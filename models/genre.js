@@ -1,31 +1,36 @@
-var genres = []
-var genresId = 1;
+var db = require('../database/database');
 
-class Genre { 
-  constructor(genreId, genre) {
-    this.genreId = genreId;
-    this.genre = genre;
-  }
+class Genre {
+	constructor(genreId, genre) {
+		this.genreId = genreId;
+		this.genre = genre;
+	}
 
-  static getGenreById(genreId) {
-    return genres.find(function(o){ return o.genreId==genreId;});
-  }
+	static getGenre(genreId) {
+		return db.genres.find(function (o) { return o.genreId == genreId; });
+	}
 
-  static getGenres() {
-    return genres;
-  }
+	static getGenres() {
+		return db.genres;
+	}
 
-  static updateGenre(genreId, title, releasedate, authorId){
-    var index = users.indexOf(this.getUserById(genreId));
-    users[index] =  new User(genreId, title, releasedate, authorId);
-  }
+	static createGenre(genre) {
+		db.genres.push(new Genre(genresId++, genre))
+	}
 
-  static deleteGenre(genreId) {
-    var index = users.indexOf(this.getGenreById(genreId));
-    if (index > -1) {
-        users.splice(index, 1);
-    }
-  }
+	static updateGenre(genreId, genre) {
+		var index = db.genres.indexOf(this.getGenreById(genreId));
+		db.genres[index] = new Genre(genreId, genre);
+	}
+
+	static deleteGenre(genreId) {
+		var index = db.genres.indexOf(this.getGenreById(genreId));
+		if (index > -1) {
+			db.genres.splice(index, 1);
+		}
+	}
 }
+
+var genresId = 1;
 
 module.exports = Genre;

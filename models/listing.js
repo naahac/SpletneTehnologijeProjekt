@@ -1,12 +1,11 @@
 var Book = require('./book');
 var User = require('./user')
 
-var listings = []
-var listingsId = 1;
+var db = require('../database/database');
 
 class Listing { 
-  constructor(listingsId, title, description, dateadded, status, userId, bookId) {
-    this.listingsId = listingsId;
+  constructor(listingId, title, description, dateadded, status, userId, bookId) {
+    this.listingId = listingId;
     this.title = title;
     this.description = description;
     this.dateadded = dateadded;
@@ -16,11 +15,11 @@ class Listing {
   }
 
   static getListingById(listingId) {
-    return listings.find(function(o){ return o.listingId==listingId;});
+    return db.listings.find(function(o){ return o.listingId==listingId;});
   }
 
   static getListings() {
-    return listings;
+    return db.listings;
   }
 
   static createListing(title, description, dateadded, status, userId, bookId){
@@ -30,21 +29,23 @@ class Listing {
     if(Book.getBookById(bookId) == undefined)
       return false;
 
-    listings.push(new Listing(listingsId++, title, description, dateadded, status, userId, bookId))
+    db.listings.push(new Listing(listingsId++, title, description, dateadded, status, userId, bookId))
     return true;
   }
 
-  static updateListing(listingId, title, releasedate, authorId){
-    var index = users.indexOf(this.getUserById(listingId));
-    users[index] =  new User(listingId, title, releasedate, authorId);
+  static updateListing(listingId, title, description, dateadded, status, userId, bookId){
+    var index = db.listings.indexOf(this.getListingById(listingId));
+    db.listings[index] =  new Listing(listingId, title, description, dateadded, status, userId, bookId);
   }
 
   static deleteListing(listingId) {
-    var index = users.indexOf(this.getListingById(listingId));
+    var index = db.listings.indexOf(this.getListingById(listingId));
     if (index > -1) {
-        users.splice(index, 1);
+        db.listings.splice(index, 1);
     }
   }
 }
+
+var listingsId = 1;
 
 module.exports = Listing;

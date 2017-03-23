@@ -1,33 +1,38 @@
 var Person = require('./person.js');
 
-var authors = []
-var authorsId = 1;
+var db = require('../database/database');
 
 class Author extends Person {
-    constructor(personId, name, surname, birthDate, pseudonym){
-        super(personId, name, surname, birthDate);
-        this.pseudonym = pseudonym;
-    }
+	constructor(personId, name, surname, birthDate, pseudonym) {
+		super(personId, name, surname, birthDate);
+		this.pseudonym = pseudonym;
+	}
 
-  static getAuthorById(personId) {
-    return authors.find(function(o){ return o.personId==personId;});
-  }
+	static getAuthor(personId) {
+		return db.authors.find(function (o) { return o.personId == personId; });
+	}
 
-  static getAuthors() {
-    return authors;
-  }
+	static getAuthors() {
+		return db.authors;
+	}
 
-  static updateAuthor(personId, title, releasedate, authorId){
-    var index = users.indexOf(this.getUserById(personId));
-    users[index] =  new User(personId, title, releasedate, authorId);
-  }
+	static createAuthor(name, surname, birthDate) {
+		db.authors.push(new Author(authorsId++, name, surname, birthDate))
+	}
 
-  static deleteAuthor(personId) {
-    var index = users.indexOf(this.getAuthorById(personId));
-    if (index > -1) {
-        users.splice(index, 1);
-    }
-  }
+	static updateAuthor(personId, name, surname, birthDate) {
+		var index = db.authors.indexOf(this.getAuthorById(personId));
+		db.authors[index] = new Author(personId, name, surname, birthDate);
+	}
+
+	static deleteAuthor(personId) {
+		var index = db.authors.indexOf(this.getAuthorById(personId));
+		if (index > -1) {
+			db.authors.splice(index, 1);
+		}
+	}
 }
+
+var authorsId = 1;
 
 module.exports = Author;
