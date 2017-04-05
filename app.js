@@ -20,7 +20,7 @@ app.set('view engine', 'jade');
 app.use(function (req, res, next) {
 
     // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8000');
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
 
     // Request methods you wish to allow
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
@@ -68,6 +68,9 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-app.listen(3000);
+//test
+var User = require('./models/user');
+User.createUser('ime', 'priimek', 'rojstnidatum', 'username3', 'test', 'email@mail.com', 'lokacija');
+console.log('saving user...')
 
 module.exports = app;

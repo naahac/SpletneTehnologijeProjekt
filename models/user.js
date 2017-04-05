@@ -1,6 +1,11 @@
 var Person = require('./person.js');
 
 var db = require('../database/database');
+let knex = require('knex')(require('../knexfile').development);
+let bookshelf = require('bookshelf')(knex);
+let Users = bookshelf.Model.extend({
+    tableName: 'users'
+});
 
 class User extends Person {
     constructor(personId, name, surname, birthDate, username, password, email, location) {
@@ -25,14 +30,17 @@ class User extends Person {
     }
 
     static deleteUser(personId) {
-        var index = db.users.indexOf(this.getUser(personId));
-        if (index > -1) {
-            db.users.splice(index, 1);
-        }
+
+        // var index = db.users.indexOf(this.getUser(personId));
+        // if (index > -1) {
+        //     db.users.splice(index, 1);
+        // }
     }
 
     static createUser(name, surname, birthDate, username, password, email, location) {
-        db.users.push(new User(usersId++, name, surname, birthDate, username, password, email, location))
+        let user = new User(undefined, name, surname, birthDate, username, password, email, location);
+        new Users(user).save(null, {method: 'insert'});
+        // db.users.push(new User(usersId++, name, surname, birthDate, username, password, email, location))
     }
 
     static checkLoginData(username, password) {
