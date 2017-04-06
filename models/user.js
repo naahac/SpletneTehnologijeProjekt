@@ -50,22 +50,49 @@ class User extends Person {
         });
     }
 
-    static createUser(name, surname, birthDate, username, password, email, location) {
-        let user = new User(undefined, name, surname, birthDate, username, password, email, location);
-        new Users(user).save(null, {method: 'insert'});
-        // db.users.push(new User(usersId++, name, surname, birthDate, username, password, email, location))
+    static createUser(name, surname, birthDate, username, password, email, location, callback) {
+        User.checkUsername(username, (usernameExists) => {
+            if (usernameExists) {
+                callback(false);
+                return;
+            }
+
+            let user = new User(undefined, name, surname, birthDate, username, password, email, location);
+            new Users(user).save(null, { method: 'insert' });
+
+            callback(true);
+        });
     }
 
-    static checkLoginData(username, password) {
-        var user = db.users.find(function (o) { return o.username == username && o.password == password; });
+    static checkUsername(username, callback) {
+        new Users({ 'username': username })
+            .fetch()
+            .then((model) => {
+                if (model == null)
+                    callback(false);
+                else
+                    callback(true);
+            })
+            .catch((err) => {
+                callback(false);
+            });
+    }
 
-        if (user == undefined) return -1;
 
-        return user.personId;
+
+    static getUserIdByLoginData(username, password) {
+        new Users({ 'username': username, 'password': password })
+            .fetch()
+            .then((model) => {
+                if (model == null)
+                    callback({success:false});
+                
+                callback({success:true, data:model.get('personId')});
+            })
+            .catch((err) => {
+                callback({success:false});
+            });
     }
 }
-
-var usersId = 1;
-db.users.push(new User(usersId++, "Ime", "Priimek", "8.3.1992", "test", "test", "test@test.com", "Maribor"));
 
 module.exports = User;
