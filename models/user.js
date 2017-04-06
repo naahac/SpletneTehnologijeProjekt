@@ -1,10 +1,21 @@
+'use strict';
 var Person = require('./person.js');
 
 var db = require('../database/database');
 let knex = require('knex')(require('../knexfile').development);
 let bookshelf = require('bookshelf')(knex);
+let Tokens = bookshelf.Model.extend({
+    tableName: 'token',
+    user: function (){
+        return this.belongsTo(Users, 'personId')
+    }
+});
 let Users = bookshelf.Model.extend({
-    tableName: 'users'
+    tableName: 'user',
+    idAttribute: 'personId',
+    token: function() {
+        return this.hasMany(Tokens, 'personId');
+    }
 });
 
 class User extends Person {
@@ -16,12 +27,16 @@ class User extends Person {
         this.email = email;
     }
 
-    static getUser(personId) {
-        return db.users.find(function (o) { return o.personId == personId; });
+    static getUser(personId, callback) {
+        new Users({personId : personId}).fetch({withRelated: ['token']}).then((model) => {
+            callback(model.related('token').toJSON());
+        });
     }
 
-    static getUsers() {
-        return db.users;
+    static getUsers(callback) {
+        new Users.fetch().then((data) => {
+            callback(data);
+        });
     }
 
     static updateUser(personId, name, surname, birthDate, username, password, email, location) {
@@ -29,12 +44,10 @@ class User extends Person {
         db.users[index] = new User(personId, name, surname, birthDate, username, password, email, location);
     }
 
-    static deleteUser(personId) {
-
-        // var index = db.users.indexOf(this.getUser(personId));
-        // if (index > -1) {
-        //     db.users.splice(index, 1);
-        // }
+    static deleteUser(personId, callback) {
+        new Users().where('personId', personId).destroy().then(() => {
+            console.log("user deleted");
+        });
     }
 
     static createUser(name, surname, birthDate, username, password, email, location, callback) {
