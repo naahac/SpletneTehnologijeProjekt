@@ -9,18 +9,19 @@ var Token = require('../models/token');
 router.get('/', function (req, res, next) {
     checkToken(req.query.tokenId, res);
 
-    Token.getUserId(req.query.tokenId, (userId) => {
-        if (userId == null) {
+    Token.getActiveToken(req.query.tokenId, (result) => {
+        if (!result.success) {
             res.status(404);
             res.send({ status: 'Token not found!' });
         }
 
-        User.getUser(userId, (user) => {
+        User.getUser(result.data.get('personId'), (user) => {
             if (user == null) {
                 res.status(404);
                 res.send({ status: 'User not found' });
-            } else
+            } else {
                 res.json(user);
+            }
         });
     });
 });
@@ -34,33 +35,61 @@ router.put('/', function (req, res, next) {
     }
 
     Token.getUserId(req.body.tokenId, (result) => {
-        if(!result.success){
+        if (!result.success) {
             res.status(400);
             res.send({ status: 'User was not found!' });
         }
 
-        //POST
-        User.updateUser(userId, req.body.name, req.body.surname, req.body.birthDate, req.body.username, req.body.password, req.body.email, req.body.location)
-        res.send({ status: 'OK' });
+        User.updateUser(userId, req.body.name, req.body.surname, req.body.birthDate, req.body.username, req.body.password, req.body.email, req.body.location,
+            (result) => {
+                if (!result.success) {
+                    res.status(404);
+                    res.send({ status: 'Error while updating!' });
+                }
+                else {
+                    res.send({ status: 'OK' });
+                }
+            });
     });
 });
 
 router.post('/', function (req, res, next) {
-    if (!req.body.name || !req.body.surname || !req.body.username || !req.body.password || !req.body.email) {
+    if (!req.body.name || !req.body.surname || !req.body.username || !req.body.password || !req.body.birthDate || !req.body.email || !req.body.location) {
         res.status(400);
         res.send({ status: 'Requested data not received!' });
     }
 
-    User.createUser(req.body.name, req.body.surname, req.body.birthDate, req.body.username, req.body.password, req.body.email, req.body.location)
-    res.send('OK');
+    User.createUser(req.body.name, req.body.surname, req.body.birthDate, req.body.username, req.body.password, req.body.email, req.body.location,
+        (result) => {
+            if (!result.success) {
+                res.status(404);
+                res.send('Error while inserting data!');
+            }
+            else {
+                res.send('OK');
+            }
+        });
 });
 
 router.delete('/', function (req, res, next) {
     checkToken(req.body.tokenId, res);
 
-    var userId = Token.getUserId(req.body.tokenId);
-    User.deleteUser(userId);
-    res.send({ status: 'OK' });
+    Token.getActiveToken(req.body.tokenId, (result) => {
+        if (!result.success) {
+            res.status(400);
+            res.send({ status: 'Token was not found!' });
+        }
+
+        User.deleteUser(result.data.get('personId'), (result) => {
+            if (!result.success) {
+                res.status(404);
+                res.send('Error while deleting data!');
+            }
+            else {
+                res.send({ status: 'OK' });
+            }
+        });
+    });
 });
 
 module.exports = router;

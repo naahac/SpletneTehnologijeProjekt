@@ -28,7 +28,9 @@ class User extends Person {
     }
 
     static getUser(personId, callback) {
-        new Users({personId : personId}).fetch().then((model) => {
+        new Users({personId : personId})
+        .fetch()
+        .then((model) => {
             if(model == null)
                 callback({success: false});
             else
@@ -36,14 +38,31 @@ class User extends Person {
         });
     }
 
-    static updateUser(personId, name, surname, birthDate, username, password, email, location) {
-        var index = db.users.indexOf(this.getUser(personId));
-        db.users[index] = new User(personId, name, surname, birthDate, username, password, email, location);
+    static updateUser(personId, name, surname, birthDate, username, password, email, location, callback) {
+        new Users({ personId: personId })
+			.save({ personId:personId, name:name, surname:surname, 
+                birthDate:birthDate, username:username, password:password, 
+                email:email, location:location }, {patch: true})
+			.then((model) => {
+				if (model == null)
+					callback({ success: false });
+
+				callback({ success: true });
+			})
+			.catch((err) => {
+				callback({ success: false });
+			});
     }
 
     static deleteUser(personId, callback) {
-        new Users().where('personId', personId).destroy().then(() => {
-            console.log("user deleted");
+        new Users()
+        .where('personId', personId)
+        .destroy()
+        .then(() => {
+            callback({success:true});
+        })
+        .catch( (err) => {
+            callback({success:false});
         });
     }
 
@@ -74,8 +93,6 @@ class User extends Person {
                 callback(false);
             });
     }
-
-
 
     static getUserIdByLoginData(username, password, callback) {
         new Users({ 'username': username, 'password': password })
