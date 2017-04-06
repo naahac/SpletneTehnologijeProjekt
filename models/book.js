@@ -1,10 +1,5 @@
-var Author = require('./author')
-
 var db = require('../database/database');
-let Books = bookshelf.Model.extend({
-    tableName: 'book',
-    idAttribute: 'bookId'
-});
+var Author = require('./author')
 
 class Book {
 	constructor(bookId, title, releasedate, authorId) {
@@ -17,7 +12,7 @@ class Book {
 	}
 
     static getBooks(callback) {
-        new Books()
+        new db.Books()
             .fetchAll()
             .then((models) => {
                 if(models == null)
@@ -31,7 +26,7 @@ class Book {
     }
 
 	static getBook(bookId, callback) {
-        new Books({bookId : bookId})
+        new db.Books({bookId : bookId})
             .fetch()
             .then((model) => {
                 if(model == null)
@@ -46,7 +41,7 @@ class Book {
 
 	static createBook(title, releasedate, authorId, callback) {
         let book = new Book(undefined, title, releasedate, undefined);
-        new Books(book)
+        new db.Books(book)
             .save(null, { method: 'insert' })
             .then(() => {
                 callback({success:true});
@@ -58,7 +53,7 @@ class Book {
 	}
 
 	static updateBook(bookId, title, releasedate, authorId, callback) {
-        new Books({bookId: bookId})
+        new db.Books({bookId: bookId})
             .save({
                 title: title,
                 releasedate:releasedate
@@ -72,7 +67,7 @@ class Book {
 	}
 
 	static deleteBook(bookId, callback) {
-        new Books({bookId: bookId})
+        new db.Books({bookId: bookId})
             .destroy()
             .then(() => {
                 console.log("book deleted");

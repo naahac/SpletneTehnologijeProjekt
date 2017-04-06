@@ -1,22 +1,5 @@
-'use strict';
-var Person = require('./person.js');
-
 var db = require('../database/database');
-let knex = require('knex')(require('../knexfile').development);
-let bookshelf = require('bookshelf')(knex);
-let Tokens = bookshelf.Model.extend({
-    tableName: 'token',
-    user: function (){
-        return this.belongsTo(Users, 'personId')
-    }
-});
-let Users = bookshelf.Model.extend({
-    tableName: 'user',
-    idAttribute: 'personId',
-    token: function() {
-        return this.hasMany(Tokens, 'personId');
-    }
-});
+var Person = require('./person.js');
 
 class User extends Person {
     constructor(personId, name, surname, birthDate, username, password, email, location) {
@@ -28,7 +11,7 @@ class User extends Person {
     }
 
     static getUser(personId, callback) {
-        new Users({personId : personId})
+        new db.Users({personId : personId})
         .fetch()
         .then((model) => {
             if(model == null)
@@ -39,7 +22,7 @@ class User extends Person {
     }
 
     static updateUser(personId, name, surname, birthDate, username, password, email, location, callback) {
-        new Users({ personId: personId })
+        new db.Users({ personId: personId })
 			.save({ personId:personId, name:name, surname:surname, 
                 birthDate:birthDate, username:username, password:password, 
                 email:email, location:location }, {patch: true})
@@ -55,7 +38,7 @@ class User extends Person {
     }
 
     static deleteUser(personId, callback) {
-        new Users()
+        new db.Users()
         .where('personId', personId)
         .destroy()
         .then(() => {
@@ -74,14 +57,14 @@ class User extends Person {
             }
 
             let user = new User(undefined, name, surname, birthDate, username, password, email, location);
-            new Users(user).save(null, { method: 'insert' });
+            new db.Users(user).save(null, { method: 'insert' });
 
             callback(true);
         });
     }
 
     static checkUsername(username, callback) {
-        new Users({ 'username': username })
+        new db.Users({ 'username': username })
             .fetch()
             .then((model) => {
                 if (model == null)
@@ -95,7 +78,7 @@ class User extends Person {
     }
 
     static getUserIdByLoginData(username, password, callback) {
-        new Users({ 'username': username, 'password': password })
+        new db.Users({ 'username': username, 'password': password })
             .fetch()
             .then((model) => {
                 if (model == null)

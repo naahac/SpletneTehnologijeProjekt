@@ -1,7 +1,6 @@
+var db = require('../database/database');
 var Book = require('./book');
 var User = require('./user')
-
-var db = require('../database/database');
 
 class Listing { 
   constructor(listingId, title, description, dateadded, status, userId, bookId) {
@@ -10,7 +9,7 @@ class Listing {
     this.description = description;
     this.dateadded = dateadded;
     this.status = status;
-    this.userId = userId;
+    this.personId = userId;
     this.bookId = bookId;
   }
 
