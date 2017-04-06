@@ -28,4 +28,9 @@ let Listings = bookshelf.Model.extend({
     }
 });
 
-module.exports = {Tokens, Users, Listings};
+let Books = bookshelf.Model.extend({
+    tableName: 'book',
+    idAttribute: 'bookId'
+});
+
+module.exports = {Tokens, Users, Listings, Books};

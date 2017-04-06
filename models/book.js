@@ -1,44 +1,82 @@
-var Author = require('./author')
-
 var db = require('../database/database');
+var Author = require('./author')
 
 class Book {
 	constructor(bookId, title, releasedate, authorId) {
-		this.bookId = bookId;
+	    if(bookId !== null)
+		    this.bookId = bookId;
 		this.title = title;
 		this.releasedate = releasedate;
-		this.authorId = authorId;
+        if(bookId !== null)
+		    this.authorId = authorId;
 	}
 
-	static getBook(bookId) {
-		return db.books.find(function (o) { return o.bookId == bookId; });
+    static getBooks(callback) {
+        new db.Books()
+            .fetchAll()
+            .then((models) => {
+                if(models == null)
+                    callback({success: false});
+                else
+                    callback({success: true, data: models});
+            })
+            .catch(() => {
+                callback({success: false});
+            });
+    }
+
+	static getBook(bookId, callback) {
+        new db.Books({bookId : bookId})
+            .fetch()
+            .then((model) => {
+                if(model == null)
+                    callback({success: false});
+                else
+                    callback({success: true, data: model});
+            })
+            .catch(() => {
+                callback({success: false});
+            });
 	}
 
-	static getUsers() {
-		return db.books;
-	}
-
-	static createBook(title, releasedate, authorId) {
-		if (Author.getAuthorById(authorId) == undefined)
-			return false;
-
-		db.books.push(new Book(booksId++, title, releasedate, authorId))
+	static createBook(title, releasedate, authorId, callback) {
+        let book = new Book(undefined, title, releasedate, undefined);
+        new db.Books(book)
+            .save(null, { method: 'insert' })
+            .then(() => {
+                callback({success:true});
+            })
+            .catch(() => {
+                callback({success: false})
+            });
 		return false;
 	}
 
-	static updateBook(bookId, title, releasedate, authorId) {
-		var index = db.books.indexOf(this.getBookById(bookId));
-		db.books[index] = new Book(bookId, title, releasedate, authorId);
+	static updateBook(bookId, title, releasedate, authorId, callback) {
+        new db.Books({bookId: bookId})
+            .save({
+                title: title,
+                releasedate:releasedate
+            })
+            .then(() => {
+                callback({success:true});
+            })
+            .catch(() => {
+                callback({success: false})
+            });
 	}
 
-	static deleteBook(bookId) {
-		var index = db.books.indexOf(this.getBookById(bookId));
-		if (index > -1) {
-			db.books.splice(index, 1);
-		}
+	static deleteBook(bookId, callback) {
+        new db.Books({bookId: bookId})
+            .destroy()
+            .then(() => {
+                console.log("book deleted");
+                callback({success:true});
+            })
+            .catch(() => {
+                callback({success:false});
+            });
 	}
 }
-
-var booksId = 1;
 
 module.exports = Book;
