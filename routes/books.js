@@ -6,8 +6,9 @@ var checkToken = require('../utilities/checkToken');
 
 router.get('/', function(req, res, next) {
     checkToken(req.query.tokenId, res);
-
-    res.json(classes.Book.getBooks());
+    Book.getBooks((books) => {
+        res.json(books);
+    });
 });
 
 router.get('/:id', function(req, res, next) {
@@ -24,9 +25,13 @@ router.get('/:id', function(req, res, next) {
 });
 
 router.put('/', function(req, res, next){
+    if (!req.body.tokenId || !req.body.bookId || !req.body.title || !req.body.releasedate || !req.body.authorId) {
+        res.status(400);
+        res.send({ status: 'Required data not received!' });
+    }
     checkToken(req.body.tokenId, res);
 
-    Book.updateBook(req.body.personID,req.body.name, req.body.surname, req.body.birthDate, req.body.location, (result) => {
+    Book.updateBook(req.body.bookId,req.body.title, req.body.releasedate, req.body.authorId, (result) => {
         if(result.success){
             res.status(204)
             res.send('OK');
@@ -35,13 +40,16 @@ router.put('/', function(req, res, next){
             res.send('Update failed!');
         }
     });
-
 });
 
 router.post('/', function(req, res, next){
+    if (!req.body.tokenId || !req.body.title || !req.body.releasedate || !req.body.authorId) {
+        res.status(400);
+        res.send({ status: 'Required data not received!' });
+    }
     checkToken(req.body.tokenId, res);
 
-    Book.createBook(req.body.name, req.body.surname, req.body.birthDate, req.body.location, (result) => {
+    Book.createBook(req.body.title, req.body.releasedate, req.body.authorId, (result) => {
         if(result.success){
             res.status(204)
             res.send('OK');

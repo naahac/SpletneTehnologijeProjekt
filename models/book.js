@@ -16,6 +16,20 @@ class Book {
 		    this.authorId = authorId;
 	}
 
+    static getBooks(callback) {
+        new Books()
+            .fetchAll()
+            .then((models) => {
+                if(models == null)
+                    callback({success: false});
+                else
+                    callback({success: true, data: models});
+            })
+            .catch(() => {
+                callback({success: false});
+            });
+    }
+
 	static getBook(bookId, callback) {
         new Books({bookId : bookId})
             .fetch()
