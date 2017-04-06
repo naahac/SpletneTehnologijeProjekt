@@ -28,14 +28,11 @@ class User extends Person {
     }
 
     static getUser(personId, callback) {
-        new Users({personId : personId}).fetch({withRelated: ['token']}).then((model) => {
-            callback(model.related('token').toJSON());
-        });
-    }
-
-    static getUsers(callback) {
-        new Users.fetch().then((data) => {
-            callback(data);
+        new Users({personId : personId}).fetch().then((model) => {
+            if(model == null)
+                callback({success: false});
+            else
+                callback({success: true, data :model});
         });
     }
 
