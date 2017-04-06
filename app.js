@@ -68,9 +68,4 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-//test
-var User = require('./models/user');
-User.createUser('ime', 'priimek', 'rojstnidatum', 'username3', 'test', 'email@mail.com', 'lokacija');
-console.log('saving user...')
-
 module.exports = app;

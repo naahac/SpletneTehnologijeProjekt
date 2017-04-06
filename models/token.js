@@ -1,4 +1,9 @@
 var db = require('../database/database');
+let knex = require('knex')(require('../knexfile').development);
+let bookshelf = require('bookshelf')(knex);
+let Tokens = bookshelf.Model.extend({
+	tableName: 'Token'
+});
 
 class Token {
 	constructor(tokenId, createDate, active, userId) {
@@ -8,32 +13,80 @@ class Token {
 		this.userId = userId;
 	}
 
-	static login(userId) {
-		var token = this.getActiveTokenByUserId(userId);
+	static login(userId, callback) {
+		this.getActiveTokenIdByUserId(userId, (result) => {
+			if (!result.success) {
+				this.createToken(userId, (result) => {
+					callback(result);
+				});
+			}
 
-		if (token == -1) {
-			token = this.createToken(userId);
-			return token;
-		}
+			result.data = result.data.get('tokenId');
+			callback(result);
+		});
 
-		return token.tokenId;
+		// var token = this.getActiveTokenByUserId(userId);
+
+		// if (token == -1) {
+		// 	token = this.createToken(userId);
+		// 	return token;
+		// }
+
+		// return token.tokenId;
 	}
 
-	static logout(tokenId) {
-		var token = this.getToken(tokenId);
+	static logout(tokenId, callback) {
+		let user = new User(undefined, name, surname, birthDate, username, password, email, location);
 
-		if (token == undefined) return false;
+		new Tokens({ tokenId: tokenId })
+			.save({ active: true })
+			.then((model) => {
+				if (model == null)
+					callback({ success: false });
 
-		var index = db.tokens.indexOf(token);
-		db.tokens[index].active = false;
+				callback({ success: true });
+			})
+			.catch((err) => {
+				callback({ success: false });
+			});
 
-		return true;
+		// User.checkUsername(username, (usernameExists) => {
+		//     if (usernameExists) {
+		//         callback(false);
+		//         return;
+		//     }
+
+		//     let user = new User(undefined, name, surname, birthDate, username, password, email, location);
+		//     new Users(user).save();
+
+		//     callback(true);
+		// });
+
+
+		// var token = this.getToken(tokenId);
+
+		// if (token == undefined) return false;
+
+		// var index = db.tokens.indexOf(token);
+		// db.tokens[index].active = false;
+
+		// return true;
 	}
 
 	static createToken(userId) {
-		var tokenId = this.CreateGUID();
-		db.tokens.push(new Token(tokenId, Date.now(), true, userId));
-		return tokenId;
+		tokenId = this.CreateGUID();
+
+		let token = new Token(tokenId, Date.now(), true, userId);
+
+		new Tokens(token)
+			.save(null, { method: 'insert' })
+			.then((model) => {
+				callback({ success: true, data: tokenId });
+			})
+			.catch((err) => {
+				callback({ success: false });
+			});
+
 	}
 
 	static isActive(tokenId) {
@@ -43,18 +96,23 @@ class Token {
 
 		return true;
 	}
-	
-	static getToken(tokenId){
+
+	static getToken(tokenId) {
 		return db.tokens.find(function (o) { return o.tokenId == tokenId; });
 	}
 
-	static getActiveTokenByUserId(userId) {
-		var token = db.tokens.find(function (o) { return o.userId == userId && o.active == true; });
-
-		if (token == undefined)
-			token = -1;
-
-		return token;
+	static getActiveTokenIdByUserId(userId) {
+		new Tokens({ 'userId':userId, 'active':true })
+			.fetch()
+			.then((model) => {
+				if (model == null)
+					callback({success:false});
+				else
+					callback({success:true, data:model.get('tokenId')});
+			})
+			.catch((err) => {
+				callback({success:false});
+			});
 	}
 
 	static getUserId(tokenId) {
