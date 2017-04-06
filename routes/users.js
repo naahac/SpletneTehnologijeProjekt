@@ -28,14 +28,21 @@ router.get('/', function (req, res, next) {
 router.put('/', function (req, res, next) {
     checkToken(req.body.tokenId, res);
 
-    if (!req.body.name || !req.body.surname || !req.body.username || !req.body.password || !req.body.email) {
+    if (!req.body.name || !req.body.surname || !req.body.username || !req.body.password || !req.body.birthDate || !req.body.email || !req.body.location) {
         res.status(400);
         res.send({ status: 'Requested data not received!' });
     }
 
-    var userId = Token.getUserId(req.body.tokenId);
-    User.updateUser(userId, req.body.name, req.body.surname, req.body.birthDate, req.body.username, req.body.password, req.body.email, req.body.location)
-    res.send({ status: 'OK' });
+    Token.getUserId(req.body.tokenId, (result) => {
+        if(!result.success){
+            res.status(400);
+            res.send({ status: 'User was not found!' });
+        }
+
+        //POST
+        User.updateUser(userId, req.body.name, req.body.surname, req.body.birthDate, req.body.username, req.body.password, req.body.email, req.body.location)
+        res.send({ status: 'OK' });
+    });
 });
 
 router.post('/', function (req, res, next) {

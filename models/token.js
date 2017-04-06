@@ -2,7 +2,8 @@ var db = require('../database/database');
 let knex = require('knex')(require('../knexfile').development);
 let bookshelf = require('bookshelf')(knex);
 let Tokens = bookshelf.Model.extend({
-	tableName: 'Token'
+	tableName: 'Token',
+	idAttribute: 'tokenId'
 });
 
 class Token {
@@ -10,7 +11,7 @@ class Token {
 		this.tokenId = tokenId;
 		this.createDate = createDate;
 		this.active = active;
-		this.userId = userId;
+		this.personId = userId;
 	}
 
 	static login(userId, callback) {
@@ -19,27 +20,14 @@ class Token {
 				this.createToken(userId, (result) => {
 					callback(result);
 				});
-			}
-
-			result.data = result.data.get('tokenId');
-			callback(result);
+			}else
+				callback(result);
 		});
-
-		// var token = this.getActiveTokenByUserId(userId);
-
-		// if (token == -1) {
-		// 	token = this.createToken(userId);
-		// 	return token;
-		// }
-
-		// return token.tokenId;
 	}
 
 	static logout(tokenId, callback) {
-		let user = new User(undefined, name, surname, birthDate, username, password, email, location);
-
 		new Tokens({ tokenId: tokenId })
-			.save({ active: true })
+			.save({ active: false }, {patch: true})
 			.then((model) => {
 				if (model == null)
 					callback({ success: false });
@@ -49,33 +37,10 @@ class Token {
 			.catch((err) => {
 				callback({ success: false });
 			});
-
-		// User.checkUsername(username, (usernameExists) => {
-		//     if (usernameExists) {
-		//         callback(false);
-		//         return;
-		//     }
-
-		//     let user = new User(undefined, name, surname, birthDate, username, password, email, location);
-		//     new Users(user).save();
-
-		//     callback(true);
-		// });
-
-
-		// var token = this.getToken(tokenId);
-
-		// if (token == undefined) return false;
-
-		// var index = db.tokens.indexOf(token);
-		// db.tokens[index].active = false;
-
-		// return true;
 	}
 
-	static createToken(userId) {
-		tokenId = this.CreateGUID();
-
+	static createToken(userId, callback) {
+		let tokenId = this.CreateGUID();
 		let token = new Token(tokenId, Date.now(), true, userId);
 
 		new Tokens(token)
@@ -86,23 +51,28 @@ class Token {
 			.catch((err) => {
 				callback({ success: false });
 			});
-
 	}
 
-	static isActive(tokenId) {
-		var token = db.tokens.find(function (o) { return o.tokenId == tokenId && o.active == true; });
-
-		if (token == undefined) return false;
-
-		return true;
+	static isActive(tokenId, callback) {
+		new Tokens({ 'tokenId':tokenId, 'active':true })
+			.fetch()
+			.then((model) => {
+				if (model == null)
+					callback({success:false});
+				else
+					callback({success:true});
+			})
+			.catch((err) => {
+				callback({success:false});
+			});
 	}
 
 	static getToken(tokenId) {
 		return db.tokens.find(function (o) { return o.tokenId == tokenId; });
 	}
 
-	static getActiveTokenIdByUserId(userId) {
-		new Tokens({ 'userId':userId, 'active':true })
+	static getActiveTokenIdByUserId(userId, callback) {
+		new Tokens({ 'personId':userId, 'active':true })
 			.fetch()
 			.then((model) => {
 				if (model == null)
