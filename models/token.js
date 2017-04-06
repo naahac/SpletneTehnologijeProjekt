@@ -1,10 +1,4 @@
 var db = require('../database/database');
-let knex = require('knex')(require('../knexfile').development);
-let bookshelf = require('bookshelf')(knex);
-let Tokens = bookshelf.Model.extend({
-	tableName: 'Token',
-	idAttribute: 'tokenId'
-});
 
 class Token {
 	constructor(tokenId, createDate, active, userId) {
@@ -26,7 +20,7 @@ class Token {
 	}
 
 	static logout(tokenId, callback) {
-		new Tokens({ tokenId: tokenId })
+		new db.Tokens({ tokenId: tokenId })
 			.save({ active: false }, {patch: true})
 			.then((model) => {
 				if (model == null)
@@ -43,7 +37,7 @@ class Token {
 		let tokenId = this.CreateGUID();
 		let token = new Token(tokenId, Date.now(), true, userId);
 
-		new Tokens(token)
+		new db.Tokens(token)
 			.save(null, { method: 'insert' })
 			.then((model) => {
 				callback({ success: true, data: tokenId });
@@ -54,7 +48,7 @@ class Token {
 	}
 
 	static getActiveToken(tokenId, callback) {
-		new Tokens({ 'tokenId':tokenId, 'active':true })
+		new db.Tokens({ 'tokenId':tokenId, 'active':true })
 			.fetch()
 			.then((model) => {
 				if (model == null)
@@ -68,7 +62,7 @@ class Token {
 	}
 
 	static getActiveTokenIdByUserId(userId, callback) {
-		new Tokens({ 'personId':userId, 'active':true })
+		new db.Tokens({ 'personId':userId, 'active':true })
 			.fetch()
 			.then((model) => {
 				if (model == null)

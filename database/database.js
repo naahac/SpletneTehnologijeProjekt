@@ -1,14 +1,31 @@
-var users = [];
-var tokens = [];
-var books = [];
-var authors = [];
-var genres = [];
-var chats = [];
-var listings = [];
-var messages = [];
-var pictures = [];
-var userLikesAuthors = [];
-var userLikesBooks = [];
-var userLikesGenres = [];
+let knex = require('knex')(require('../knexfile').development);
+let bookshelf = require('bookshelf')(knex);
 
-module.exports = {users, tokens, books, authors, genres, chats, listings, messages, pictures, userLikesAuthors, userLikesBooks, userLikesGenres};
+let Tokens = bookshelf.Model.extend({
+    tableName: 'token',
+	idAttribute: 'tokenId',
+    user: function (){
+        return this.belongsTo(Users, 'personId')
+    }
+});
+
+let Users = bookshelf.Model.extend({
+    tableName: 'user',
+    idAttribute: 'personId',
+    token: function() {
+        return this.hasMany(Tokens, 'personId');
+    },
+	listing: function() {
+        return this.hasMany(Listings, 'personId');
+    }
+});
+
+let Listings = bookshelf.Model.extend({
+    tableName: 'listing',
+	idAttribute: 'listingId',
+    user: function (){
+        return this.belongsTo(Users, 'personId')
+    }
+});
+
+module.exports = {Tokens, Users, Listings};
