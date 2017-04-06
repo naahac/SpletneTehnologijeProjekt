@@ -6,8 +6,8 @@ function checkToken(tokenId, res) {
         res.send("Token not received");
     }
 
-    token.isActive(tokenId, (active) => {
-        if (!active) {
+    token.isActive(tokenId, (result) => {
+        if (!result.success) {
             res.status(401);
             res.send("You don't have authorization for this action!");
         }

@@ -20,7 +20,7 @@ router.post('/login', function (req, res, next) {
 			res.send({ status: 'User not found' });
 		}
 
-		Token.login(userId, (result) => {
+		Token.login(result.data, (result) => {
 			if (!result.success) {
 				res.status(404);
 				res.send({ status: 'Encountered error while logging in' });
@@ -32,11 +32,15 @@ router.post('/login', function (req, res, next) {
 });
 
 router.post('/logout', function (req, res, next) {
-	if (req.body.tokenId)
-		res.json(Token.logout(req.body.tokenId))
-
-	res.status(400);
-	res.send({ status: 'Token not received' });
+	if (req.body.tokenId) {
+		Token.logout(req.body.tokenId, (result) => {
+			res.json(result.success);
+		});
+	}
+	else {
+		res.status(400);
+		res.send({ status: 'Token not received' });
+	}
 });
 
 module.exports = router;

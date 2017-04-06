@@ -77,7 +77,7 @@ class User extends Person {
 
 
 
-    static getUserIdByLoginData(username, password) {
+    static getUserIdByLoginData(username, password, callback) {
         new Users({ 'username': username, 'password': password })
             .fetch()
             .then((model) => {
