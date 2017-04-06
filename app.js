@@ -68,15 +68,4 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-//test
-var User = require('./models/user');
-// User.createUser('ime', 'priimek', 'rojstnidatum', 'username3', 'test', 'email@mail.com', 'lokacija');
-// User.createUser('ime2', 'priimek2', 'rojstnidatum2', 'username4', 'test', 'email@mail.com', 'lokacija');
-// console.log('saving user...')
-// User.deleteUser(1);
-// console.log('deleting user...')
-User.getUser(1, (data) => {
-    console.log(data);
-});
-
 module.exports = app;

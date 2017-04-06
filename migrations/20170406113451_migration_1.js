@@ -51,6 +51,7 @@ exports.up = function(knex, Promise) {
 };
 
 exports.down = function(knex, Promise) {
+
     return knex.schema.dropTable('user')
         .dropTable('token')
         .dropTable('author')
