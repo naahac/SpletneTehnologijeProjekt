@@ -53,22 +53,18 @@ class Token {
 			});
 	}
 
-	static isActive(tokenId, callback) {
+	static getActiveToken(tokenId, callback) {
 		new Tokens({ 'tokenId':tokenId, 'active':true })
 			.fetch()
 			.then((model) => {
 				if (model == null)
 					callback({success:false});
 				else
-					callback({success:true});
+					callback({success:true, data:model});
 			})
 			.catch((err) => {
 				callback({success:false});
 			});
-	}
-
-	static getToken(tokenId) {
-		return db.tokens.find(function (o) { return o.tokenId == tokenId; });
 	}
 
 	static getActiveTokenIdByUserId(userId, callback) {
@@ -83,15 +79,6 @@ class Token {
 			.catch((err) => {
 				callback({success:false});
 			});
-	}
-
-	static getUserId(tokenId) {
-		var token = db.tokens.find(function (o) { return o.tokenId == tokenId && o.active == true; });
-
-		if (token == undefined)
-			token = -1;
-
-		return token.userId;
 	}
 
 	static S4() {
