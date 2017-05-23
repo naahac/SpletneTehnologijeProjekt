@@ -21,20 +21,34 @@ class User extends Person {
         });
     }
 
-    static updateUser(personId, name, surname, birthDate, username, password, email, location, callback) {
+    static updateUser(personId, name, surname, birthDate, email, location, callback) {
         new db.Users({ personId: personId })
 			.save({ personId:personId, name:name, surname:surname, 
-                birthDate:birthDate, username:username, password:password, 
+                birthDate:birthDate,
                 email:email, location:location }, {patch: true})
 			.then((model) => {
 				if (model == null)
 					callback({ success: false });
-
-				callback({ success: true });
+                else
+				    callback({ success: true });
 			})
 			.catch((err) => {
 				callback({ success: false });
 			});
+    }
+
+    static changePassword(personId, oldPassword, newPassword, callback) {
+        new db.Users({ personId: personId, password:oldPassword })
+            .save({ personId:personId, password:newPassword }, {patch: true})
+            .then((model) => {
+                if (model == null)
+                    callback({ success: false });
+                else
+                    callback({ success: true });
+            })
+            .catch((err) => {
+                callback({ success: false });
+            });
     }
 
     static deleteUser(personId, callback) {
@@ -83,8 +97,8 @@ class User extends Person {
             .then((model) => {
                 if (model == null)
                     callback({success:false});
-                
-                callback({success:true, data:model.get('personId')});
+                else
+                    callback({success:true, data:model.get('personId')});
             })
             .catch((err) => {
                 callback({success:false});
