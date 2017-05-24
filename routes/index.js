@@ -12,23 +12,23 @@ router.post('/login', function (req, res, next) {
 	if (!req.body.username || !req.body.password) {
 		res.status(400);
 		res.send({ status: 'Login data not received!' });
-	}
-
-	User.getUserIdByLoginData(req.body.username, req.body.password, (result) => {
-		if (!result.success) {
-			res.status(404);
-			res.send({ status: 'User not found' });
-		}
-
-		Token.login(result.data, (result) => {
-			if (!result.success) {
-				res.status(404);
-				res.send({ status: 'Encountered error while logging in' });
-			}
-
-			res.json(result.data);
-		});
-	});
+	}else{
+        User.getUserIdByLoginData(req.body.username, req.body.password, (result) => {
+            if (!result.success) {
+                res.status(404);
+                res.send({ status: 'User not found' });
+            }else{
+                Token.login(result.data, (result) => {
+                    if (!result.success) {
+                        res.status(404);
+                        res.send({ status: 'Encountered error while logging in' });
+                    }else{
+                        res.json(result.data);
+                    }
+                });
+            }
+        });
+    }
 });
 
 router.post('/logout', function (req, res, next) {
