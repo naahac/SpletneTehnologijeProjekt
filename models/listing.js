@@ -13,38 +13,102 @@ class Listing {
     this.bookId = bookId;
   }
 
-  static getListingById(listingId) {
-    return db.listings.find(function(o){ return o.listingId==listingId;});
-  }
-
-  static getListings() {
-    return db.listings;
-  }
-
-  static createListing(title, description, dateadded, status, userId, bookId){
-    if(User.getUserById(userId) == undefined)
-      return false;
-
-    if(Book.getBookById(bookId) == undefined)
-      return false;
-
-    db.listings.push(new Listing(listingsId++, title, description, dateadded, status, userId, bookId))
-    return true;
-  }
-
-  static updateListing(listingId, title, description, dateadded, status, userId, bookId){
-    var index = db.listings.indexOf(this.getListingById(listingId));
-    db.listings[index] =  new Listing(listingId, title, description, dateadded, status, userId, bookId);
-  }
-
-  static deleteListing(listingId) {
-    var index = db.listings.indexOf(this.getListingById(listingId));
-    if (index > -1) {
-        db.listings.splice(index, 1);
+  static getListing(listingId, callback) {
+        new db.Listings({listingId: listingId})
+        .fetch()
+        .then((model) => {
+            if(model == null)
+                callback({success: false});
+            else
+                callback({success: true, data :model});
+        });
     }
-  }
-}
 
-var listingsId = 1;
+    static getListings(callback) {
+        new db.Listings()
+            .fetchAll()
+            .then((models) => {
+                if(models == null)
+                    callback({success: false});
+                else
+                    callback({success: true, data: models});
+            })
+            .catch(() => {
+                callback({success: false});
+            });
+    }
+
+  static getListingsByUserId(userId, callback) {
+    new db.Books({userId: userId})
+            .fetchAll()
+            .then((models) => {
+                if(models == null)
+                    callback({success: false});
+                else
+                    callback({success: true, data: models});
+            })
+            .catch(() => {
+                callback({success: false});
+            });
+  }
+
+    static insertListing(listingId, title, description, dateadded, status, userId, bookId, callback) {
+        if(listingId != null){
+            let book = new Book(listingId, title, description, dateadded, status, userId, bookId);
+        }else{
+            let book = new Book(title, description, dateadded, status, userId, bookId);
+        }
+
+        new db.Listing(listing)
+        .save()
+        .then(() => {
+            callback({success:true});
+        })
+        .catch(() => {
+            callback({success:false});
+        });
+    }
+
+  // static createListing(title, description, dateadded, status, userId, bookId, callback){
+  //   if(User.getUserById(userId) == undefined){
+  //     callback(false);
+  //     return;
+  //   }
+      
+  //   if(Book.getBookById(bookId) == undefined){
+  //     callback(false);
+  //      return;
+  //   }
+     
+  //   db.Listings.push(new Listing(listingsId++, title, description, dateadded, status, userId, bookId))
+  //   callback(true);
+  // }
+
+  // static updateListing(listingId, title, description, dateadded, status, userId, bookId, callback) {
+  //       new db.Listings({ personId: personId })
+	// 		.save({ listingId:listingId, title:title, description:description, dateadded:dateadded, status:status, userId:userId, bookId:bookId }, {patch: true})
+	// 		.then((model) => {
+	// 			if (model == null)
+	// 				callback({ success: false });
+  //               else
+	// 			    callback({ success: true });
+	// 		})
+	// 		.catch((err) => {
+	// 			callback({ success: false });
+	// 		});
+  //   }
+
+  static deleteListing(listingId, callback) {
+        new db.Listings()
+        .where('listingId', listingId)
+        .destroy()
+        .then(() => {
+            callback({success:true});
+        })
+        .catch( (err) => {
+            callback({success:false});
+        });
+    }
+}
 
 module.exports = Listing;

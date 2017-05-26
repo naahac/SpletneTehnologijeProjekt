@@ -2,76 +2,125 @@ var express = require('express');
 var router = express.Router();
 
 var Book = require("./../models/book");
+var Token = require("./../models/token");
 var checkToken = require('../utilities/checkToken');
 
 router.get('/', function(req, res, next) {
-    checkToken(req.query.tokenId, res);
-    Book.getBooks((books) => {
-        res.json(books);
-    });
+	checkToken(req.query.tokenId, res, (authorized => {
+		if(!authorized)
+            return;
+
+		Book.getBook(req.body.bookId, (response) => {
+			if (!response.success) {
+				res.status(404);
+				res.send({status: 'Listing not found'});
+			} else {
+				res.json(response.data);
+			}
+		});
+	}));
 });
 
-router.get('/:id', function(req, res, next) {
-    checkToken(req.query.tokenId, res);
+router.get('/byuserid', function(req, res, next) {
+	checkToken(req.query.tokenId, res, (authorized => {
+		if(!authorized)
+            return;
 
-    Book.getBook(req.params.id, (result) => {
-        if(result.success){
-            res.json(result.data);
-        }else {
-            res.status(404);
-            res.send("Book not found");
-        }
-    });
+        Token.getUserId(req.query.tokenId, (userId) => {
+            if(userId.success){
+                Book.getBooksByUserId(userId.data, (response) => {
+                    if (!response.success) {
+                        res.status(404);
+                        res.send({status: 'Books not found'});
+                    } else {
+                        res.json(response.data);
+                    }
+		        });
+            } else {
+                res.status(404);
+                res.send('Error while getting your user data!');
+            }
+        });
+	}));
 });
 
-router.put('/', function(req, res, next){
-    if (!req.body.tokenId || !req.body.bookId || !req.body.title || !req.body.releasedate || !req.body.authorId) {
-        res.status(400);
-        res.send({ status: 'Required data not received!' });
-    }
-    checkToken(req.body.tokenId, res);
+router.get('/all', function(req, res, next) {
+	checkToken(req.query.tokenId, res, (authorized => {
+		if(!authorized)
+            return;
 
-    Book.updateBook(req.body.bookId,req.body.title, req.body.releasedate, req.body.authorId, (result) => {
-        if(result.success){
-            res.status(204)
-            res.send('OK');
-        }else{
-            res.status(404);
-            res.send('Update failed!');
-        }
-    });
+		Book.getBooks((response) => {
+			if (!response.success) {
+				res.status(404);
+				res.send({status: 'Books not found'});
+			} else {
+				res.json(response.data);
+			}
+		});
+	}));
 });
 
 router.post('/', function(req, res, next){
-    if (!req.body.tokenId || !req.body.title || !req.body.releasedate || !req.body.authorId) {
-        res.status(400);
-        res.send({ status: 'Required data not received!' });
-    }
-    checkToken(req.body.tokenId, res);
-
-    Book.createBook(req.body.title, req.body.releasedate, req.body.authorId, (result) => {
-        if(result.success){
-            res.status(204)
-            res.send('OK');
-        }else{
-            res.status(404);
-            res.send('Insert failed!');
-        }
-    });
+	checkToken(req.query.tokenId, res, (authorized => {
+		if(!authorized)
+            return;
+		
+		if (!req.body.title || !req.body.releasedate || !req.body.authorId) {
+            res.status(400);
+            res.send({status: 'Requested data not received!'});
+        } else {
+			Book.insertBook(null, req.body.title, req.body.releasedate, req.body.authorId,
+            (response) => {
+                if (!response.success) {
+                    res.status(404);
+                    res.send('Error while inserting data!');
+                }
+                else {
+                    res.send('OK');
+                }
+            });
+		}		
+	}));
 });
 
-router.delete('/', function(req, res, next){
-    checkToken(req.body.tokenId, res);
-    
-    Book.deleteBook(req.body.bookId, (result) => {
-        if(result.success){
-            res.status(204)
-            res.send('OK');
-        }else{
-            res.status(404);
-            res.send('Delete failed!');
-        }
-    });
+router.put('/', function (req, res, next) {
+    checkToken(req.query.tokenId, res, (authorized => {
+        if(!authorized)
+            return;
+        
+		if (!req.body.bookId || !req.body.title || !req.body.releasedate || !req.body.authorId) {
+            res.status(400);
+            res.send({status: 'Requested data not received!'});
+        } else {
+			Book.insertBook(req.body.bookId, req.body.title, req.body.releasedate, req.body.authorId,
+			(result) => {
+				if (!result.success) {
+					res.status(404);
+					res.send({status: 'Error while updating!'});
+				}
+				else {
+					res.send({status: 'OK'});
+				}
+			});
+		}
+    }));
+});
+
+router.delete('/', function (req, res, next) {
+	checkToken(req.query.tokenId, res, (authorized => {
+		if(!authorized)
+            return;
+
+		Book.deleteBook(req.body.bookId, (response) => {
+                    if (!response.success) {
+                        res.status(404);
+                        res.send('Error while deleting data!');
+                    }
+                    else {
+                        res.send({status: 'OK'});
+                    }
+                });
+	}));
 });
 
 module.exports = router;

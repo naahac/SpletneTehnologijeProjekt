@@ -1,46 +1,142 @@
-// var express = require('express');
-// var router = express.Router();
+var express = require('express');
+var router = express.Router();
 
-// var classes = require("./../controllers/classes");
-// var util = require('./utilities');
+var checkToken = require('../utilities/checkToken');
+var Token = require("./../models/token");
+var Listing = require('../models/listing');
 
-// router.get('/', function(req, res, next) {
-//     util.checkToken(req.query.tokenId, res);
+router.get('/', function(req, res, next) {
+	checkToken(req.query.tokenId, res, (authorized => {
+		if(!authorized)
+            return;
 
-//     res.json(classes.Listing.getListings());
-// });
+		Listing.getListing(req.body.listingId, (response) => {
+			if (!response.success) {
+				res.status(404);
+				res.send({status: 'Listing not found'});
+			} else {
+				res.json(response.data);
+			}
+		});
+	}));
+});
 
-// router.get('/', function(req, res, next) {
-//     util.checkToken(req.query.tokenId, res);
+router.get('/byuserid', function(req, res, next) {
+	checkToken(req.query.tokenId, res, (authorized => {
+		if(!authorized)
+            return;
 
-//     var user = classes.Listing.getListingById(req.body.listingId);
-//     if(user === undefined){
-//             res.status(404)
-//             res.send("User not found");
-//         }else {
-//             res.json(user);
-//         }
-// });
+		Token.getUserId(req.query.tokenId, (userId) => {
+            if(userId.success){
+                Listing.getListingsByUserId(userId.data, (response) => {
+					if (!response.success) {
+						res.status(404);
+						res.send({status: 'Listing not found'});
+					} else {
+						res.json(response.data);
+					}
+				});
+            } else {
+                res.status(404);
+                res.send('Error while getting your user data!');
+            }
+        });
+	}));
+});
 
-// router.put('/', function(req, res, next){
-//     util.checkToken(req.body.tokenId, res);
+router.get('/all', function(req, res, next) {
+	checkToken(req.query.tokenId, res, (authorized => {
+		if(!authorized)
+            return;
 
-//     classes.Listing.updateListing(req.body.listingId, req.body.title, req.body.releaseDate, req.body.authorId);
-//     res.send('OK');
-// });
+		Listing.getListings((response) => {
+			if (!response.success) {
+				res.status(404);
+				res.send({status: 'Listing not found'});
+			} else {
+				res.json(response.data);
+			}
+		});
+	}));
+});
 
-// router.post('/', function(req, res, next){
-//     util.checkToken(req.body.tokenId, res);
+router.post('/', function(req, res, next){
+	checkToken(req.query.tokenId, res, (authorized => {
+		if(!authorized)
+            return;
+		
+		if (!req.body.title || !req.body.description || !req.body.dateAdded || !req.body.status || !req.body.bookId) {
+            res.status(400);
+            res.send({status: 'Requested data not received!'});
+        } else {
+			Token.getUserId(req.query.tokenId, (userId) => {
+				if(userId.success){
+					Listing.insertListing(null, req.body.title, req.body.description, req.body.dateAdded,
+					req.body.status, userId.data, req.body.bookId,
+					(response) => {
+						if (!response.success) {
+							res.status(404);
+							res.send('Error while inserting data!');
+						}
+						else {
+							res.send('OK');
+						}
+					});
+				} else {
+					res.status(404);
+					res.send('Error while getting your user data!');
+				}
+			});
+		}		
+	}));
+});
 
-//     classes.Listing.createListing(req.body.title, req.body.releaseDate, req.body.authorId)
-//     res.send('OK');
-// });
+router.put('/', function (req, res, next) {
+    checkToken(req.query.tokenId, res, (authorized => {
+        if(!authorized)
+            return;
+        
+		if (!req.body.listingId || !req.body.title || !req.body.description || !req.body.dateAdded || !req.body.status || !req.body.bookId) {
+            res.status(400);
+            res.send({status: 'Requested data not received!'});
+        } else {
+			Token.getUserId(req.query.tokenId, (userId) => {
+				if(userId.success){
+					Listing.insertListing(req.body.listingId, req.body.title, req.body.description, 
+					req.body.dateAdded, req.body.status, userId.data, req.body.bookId,
+					(result) => {
+						if (!result.success) {
+							res.status(404);
+							res.send({status: 'Error while updating!'});
+						}
+						else {
+							res.send({status: 'OK'});
+						}
+					});
+				} else {
+					res.status(404);
+					res.send('Error while getting your user data!');
+				}
+			});
+		}
+    }));
+});
 
-// router.delete('/', function(req, res, next){
-//     util.checkToken(req.body.tokenId, res);
-    
-//     classes.User.deleteListing(req.body.listingId)
-//     res.send('OK');
-// });
+router.delete('/', function (req, res, next) {
+	checkToken(req.query.tokenId, res, (authorized => {
+		if(!authorized)
+            return;
 
-// module.exports = router;
+		Listing.deleteListing(req.body.listingId, (response) => {
+                    if (!response.success) {
+                        res.status(404);
+                        res.send('Error while deleting data!');
+                    }
+                    else {
+                        res.send({status: 'OK'});
+                    }
+                });
+	}));
+});
+
+module.exports = router;

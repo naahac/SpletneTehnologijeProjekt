@@ -1,4 +1,4 @@
-var token = require('./../models/token');
+var Token = require('./../models/token');
 
 function checkToken(tokenId, res, callback) {
     if (!tokenId) {
@@ -8,7 +8,7 @@ function checkToken(tokenId, res, callback) {
         return;
     }
 
-    token.getActiveToken(tokenId, (result) => {
+    Token.getActiveToken(tokenId, (result) => {
         if (!result.success) {
             res.status(401);
             res.send("You don't have authorization for this action!");

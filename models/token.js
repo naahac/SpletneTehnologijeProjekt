@@ -61,6 +61,20 @@ class Token {
 			});
 	}
 
+	static getUserId(tokenId, callback) {
+		new db.Tokens({ 'tokenId':tokenId, 'active':true })
+			.fetch()
+			.then((model) => {
+				if (model == null)
+					callback({success:false});
+				else
+					callback({success:true, data:model.userId});
+			})
+			.catch((err) => {
+				callback({success:false});
+			});
+	}
+
 	static getActiveTokenIdByUserId(userId, callback) {
 		new db.Tokens({ 'personId':userId, 'active':true })
 			.fetch()
