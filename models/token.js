@@ -68,7 +68,7 @@ class Token {
 				if (model == null)
 					callback({success:false});
 				else
-					callback({success:true, data:model.userId});
+					callback({success:true, data:model.attributes.personId});
 			})
 			.catch((err) => {
 				callback({success:false});

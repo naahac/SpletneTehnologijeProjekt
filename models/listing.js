@@ -39,7 +39,8 @@ class Listing {
     }
 
   static getListingsByUserId(userId, callback) {
-    new db.Books({userId: userId})
+    new db.Listings()
+        .where('userId', '=', userId)
             .fetchAll()
             .then((models) => {
                 if(models == null)
@@ -47,7 +48,7 @@ class Listing {
                 else
                     callback({success: true, data: models});
             })
-            .catch(() => {
+            .catch((error) => {
                 callback({success: false});
             });
   }
@@ -59,7 +60,7 @@ class Listing {
             let book = new Book(title, description, dateadded, status, userId, bookId);
         }
 
-        new db.Listing(listing)
+        new db.Listing(book)
         .save()
         .then(() => {
             callback({success:true});

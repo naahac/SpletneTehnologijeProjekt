@@ -8,7 +8,7 @@ var bodyParser = require('body-parser');
 var index = require('./routes/index');
 var users = require('./routes/users');
 // var books = require('./routes/books');
-// var listings = require('./routes/listings');
+var listings = require('./routes/listings');
 // var userPreferences = require('./routes/userPreferences');
 // var pictures = require('./routes/pictures');
 
@@ -47,7 +47,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 app.use('/users', users);
 // app.use('/books', books);
-// app.use('/listings', listings);
+app.use('/listings', listings);
 // app.use('/userpreferences', userPreferences);
 // app.use('/pictures', pictures);
 
