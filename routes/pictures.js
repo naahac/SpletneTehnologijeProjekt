@@ -1,33 +1,49 @@
-// var express = require('express');
-// var router = express.Router();
+var express = require('express');
+var router = express.Router();
 
-// var classes = require("./../controllers/classes");
-// var util = require('./utilities');
+var Picture = require("./../models/picture");
+var util = require('./utilities');
 
-// router.get('/', function(req, res, next) {
-//     util.checkToken(req.query.tokenId, res);
+router.get('/:listingId', function(req, res, next) {
+    // util.checkToken(req.query.tokenId, res);
 
-//     var pictures = classes.Picture.getPicturesByListingId(req.body.listingId);
-//     if(pictures === undefined){
-//             res.status(404)
-//             res.send("User not found");
-//         }else {
-//             res.json(pictures);
-//         }
-// });
+    Picture.getPicturesByListingId(req.params.listingId, (result) =>{
+        if(result === undefined || !result.success){
+            res.status(404)
+            res.send("User not found");
+        }else {
+            var imageBuffer = decodeBase64Image(result.data.attributes.picture);
+            res.writeHead(200, {'Content-Type': imageBuffer.type});
+            res.end(imageBuffer.buffer, 'binary'); // Send the file data to the browser.
+        }
+    });
 
-// router.post('/', function(req, res, next){
-//     util.checkToken(req.body.tokenId, res);
+});
 
-//     classes.Listing.createListing(req.body.title, req.body.releaseDate, req.body.authorId)
-//     res.send('OK');
-// });
+function decodeBase64Image(dataString) {
+    dataString = dataString.replace(/\n/g, '');
+    let matches = dataString.match(/data:([A-Za-z-+\/]+);base64,(.+)/),
+        response = {};
 
-// router.delete('/', function(req, res, next){
-//     util.checkToken(req.body.tokenId, res);
+    if (matches.length !== 3) {
+        return new Error('Invalid input string');
+    }
+    response.type = matches[1];
+    response.buffer = new Buffer(matches[2], 'base64');
+    return response;
+}
+
+router.post('/', function(req, res, next){
+    Picture.createPicture(req.body.picture, req.body.listingId)
+    classes.Listing.createListing(req.body.title, req.body.releaseDate, req.body.authorId)
+    res.send('OK');
+});
+
+router.delete('/', function(req, res, next){
+    util.checkToken(req.body.tokenId, res);
     
-//     classes.Picture.deletePicture(req.body.pictureId)
-//     res.send('OK');
-// });
+    classes.Picture.deletePicture(req.body.pictureId)
+    res.send('OK');
+});
 
-// module.exports = router;
+module.exports = router;
