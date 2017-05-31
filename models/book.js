@@ -38,13 +38,13 @@ class Book {
                 else
                     callback({success: true, data: models});
             })
-            .catch(() => {
+            .catch((error) => {
                 callback({success: false});
             });
         } else{
             new db.Books()
             .query(function(qb) {
-                qb.where('title', 'LIKE', title).orWhere('authorId', '=', author);
+                qb.where('title', 'LIKE', title).where('authorId', '=', author);
             }).fetchAll()
             .then((models) => {
                 if(models == null)

@@ -10,7 +10,7 @@ router.get('/', function(req, res, next) {
 		if(!authorized)
             return;
 
-		Listing.getListing(req.body.listingId, (response) => {
+		Listing.getListing(req.query.listingId, (response) => {
 			if (!response.success) {
 				res.status(404);
 				res.send({status: 'Listing not found'});

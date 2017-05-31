@@ -21,19 +21,23 @@ class Listing {
   }
 
   static getListing(listingId, callback) {
-        new db.Listings({listingId: listingId})
-        .fetch()
+        new db.Listings()
+        .where({listingId: listingId})
+        .fetch({withRelated: ['book', 'book.author', 'book.genre']})
         .then((model) => {
             if(model == null)
                 callback({success: false});
             else
-                callback({success: true, data :model});
+                callback({success: true, data: model});
+        })
+        .catch((error) => {
+            callback({success: false});
         });
     }
 
     static getListings(callback) {
         new db.Listings()
-            .fetchAll()
+            .fetchAll({withRelated: ['book', 'book.author', 'book.genre']})
             .then((models) => {
                 if(models == null)
                     callback({success: false});
@@ -46,18 +50,18 @@ class Listing {
     }
 
   static getListingsByUserId(userId, callback) {
-    new db.Listings()
-        .where('userId', '=', userId)
-            .fetchAll()
-            .then((models) => {
-                if(models == null)
-                    callback({success: false});
-                else
-                    callback({success: true, data: models});
-            })
-            .catch((error) => {
+        new db.Listings()
+        .where('userId', userId)
+        .fetchAll({withRelated: ['book', 'book.author', 'book.genre']})
+        .then((models) => {
+            if(models == null)
                 callback({success: false});
-            });
+            else
+                callback({success: true, data: models});
+        })
+        .catch((error) => {
+            callback({success: false});
+        });
   }
 
     static insertListing(listingId, title, description, dateadded, latitude, longitude, userId, bookId, callback) {
@@ -122,48 +126,42 @@ class Listing {
                     }
                 });
 
-                // Listing.insertListing(null, req.body.title, req.body.description, req.body.dateAdded,
-                // req.body.status, getUserIdResponse.data, req.body.bookId,
-                // (response) => {
-                //     if (!response.success) {
-                //         callback(userId);
-                //         return;
-                //     } else {
-                //         res.send('OK');
-                //     }
-                // });
-
             } else {
                 callback(getUserIdResponse);
                 return;
             }
         });
-
-        // new db.Listing(book)
-        // .save()
-        // .then(() => {
-        //     callback({success:true});
-        // })
-        // .catch(() => {
-        //     callback({success:false});
-        // });
     }
 
     static insertListingWithSavedBook(tokenId, listingTitle, description, dateAdded, latitude, longitude, picture, bookId, callback) {
         // TODO: Validations
 
-        if (!this.validateLocation(longitude) || !this.validateLocation(latitude)) {
-                callback({success:false, status: 'Longitude or latitude format is not valid'});
-                return;
-        }
+        // if (!this.validateLocation(longitude) || !this.validateLocation(latitude)) {
+        //         callback({success:false, status: 'Longitude or latitude format is not valid'});
+        //         return;
+        // }
 
-        new db.Listing(book)
-        .save()
-        .then(() => {
-            callback({success:true});
-        })
-        .catch(() => {
-            callback({success:false});
+        Token.getUserId(tokenId, (getUserIdResponse) => {
+            if(getUserIdResponse.success){
+
+                this.insertListing(null, listingTitle, description, dateAdded, latitude, longitude, getUserIdResponse.data, bookId, (insertListingResponse) => {
+                    if (insertListingResponse.success) {
+                        
+                        Picture.createPicture(picture, insertListingResponse.data.get('listingId'), (createPictureResponse) => {
+                            callback(createPictureResponse);
+                            return;
+                        })
+
+                    } else {
+                        callback(insertListingResponse);
+                        return;
+                    }
+                })
+
+            } else {
+                callback(getUserIdResponse);
+                return;
+            }
         });
     }
 
