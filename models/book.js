@@ -31,7 +31,7 @@ class Book {
         if(author == null){
             new db.Books()
             .where('title', 'LIKE', title)
-            .fetchAll()
+            .fetchAll({withRelated: ['author']})
             .then((models) => {
                 if(models == null)
                     callback({success: false});
@@ -44,7 +44,7 @@ class Book {
         } else{
             new db.Books()
             .query(function(qb) {
-                qb.where('title', 'LIKE', title).where('authorId', '=', author);
+                qb.where('title', 'LIKE', title).where('authorId', author);
             }).fetchAll()
             .then((models) => {
                 if(models == null)

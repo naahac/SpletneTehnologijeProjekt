@@ -6,12 +6,12 @@ var Picture = require('./picture');
 var Token = require('./token');
 
 class Listing { 
-  constructor(listingId, title, description, dateadded, latitude, longitude, status, userId, bookId) {
+  constructor(listingId, title, description, latitude, longitude, status, userId, bookId) {
     if(listingId != null)
         this.listingId = listingId;
     this.title = title;
     this.description = description;
-    this.dateadded = dateadded;
+    this.dateadded = Date.now();
     this.longitude = longitude;
     this.latitude = latitude;
     if(status != null)
@@ -64,13 +64,13 @@ class Listing {
         });
   }
 
-    static insertListing(listingId, title, description, dateadded, latitude, longitude, userId, bookId, callback) {
+    static insertListing(listingId, title, description, latitude, longitude, userId, bookId, callback) {
         let listing;
 
         if(listingId != null){
-            listing = new Listing(listingId, title, description, dateadded, latitude, longitude, null, userId, bookId);
+            listing = new Listing(listingId, title, description, latitude, longitude, null, userId, bookId);
         }else{
-            listing = new Listing(null, title, description, dateadded, latitude, longitude, true, userId, bookId);
+            listing = new Listing(null, title, description, latitude, longitude, true, userId, bookId);
         }
 
         new db.Listings(listing)
@@ -83,7 +83,7 @@ class Listing {
         });
     }
 
-    static insertListingWithNewBook(tokenId, listingTitle, description, dateAdded, latitude, longitude, picture, bookTitle, author, genreId, callback) {
+    static insertListingWithNewBook(tokenId, listingTitle, description, latitude, longitude, picture, bookTitle, author, genreId, callback) {
         // TODO: Validations
 
         // if (!this.validateLocation(longitude) || !this.validateLocation(latitude)) {
@@ -100,7 +100,7 @@ class Listing {
                         Book.insertBook(null, bookTitle, genreId, createAuthorResponse.data.get('authorId'), (insertBookResponse) => {
                             if (insertBookResponse.success) {
 
-                                this.insertListing(null, listingTitle, description, dateAdded, latitude, longitude, getUserIdResponse.data, insertBookResponse.data.get('bookId'), (insertListingResponse) => {
+                                this.insertListing(null, listingTitle, description, latitude, longitude, getUserIdResponse.data, insertBookResponse.data.get('bookId'), (insertListingResponse) => {
                                     if (insertListingResponse.success) {
                                         
                                         Picture.createPicture(picture, insertListingResponse.data.get('listingId'), (createPictureResponse) => {
@@ -133,7 +133,7 @@ class Listing {
         });
     }
 
-    static insertListingWithSavedBook(tokenId, listingTitle, description, dateAdded, latitude, longitude, picture, bookId, callback) {
+    static insertListingWithSavedBook(tokenId, listingTitle, description, latitude, longitude, picture, bookId, callback) {
         // TODO: Validations
 
         // if (!this.validateLocation(longitude) || !this.validateLocation(latitude)) {
@@ -144,7 +144,7 @@ class Listing {
         Token.getUserId(tokenId, (getUserIdResponse) => {
             if(getUserIdResponse.success){
 
-                this.insertListing(null, listingTitle, description, dateAdded, latitude, longitude, getUserIdResponse.data, bookId, (insertListingResponse) => {
+                this.insertListing(null, listingTitle, description, latitude, longitude, getUserIdResponse.data, bookId, (insertListingResponse) => {
                     if (insertListingResponse.success) {
                         
                         Picture.createPicture(picture, insertListingResponse.data.get('listingId'), (createPictureResponse) => {

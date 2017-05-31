@@ -65,9 +65,9 @@ router.post('/', function(req, res, next){
 		if(!authorized)
             return;
 
-		if (req.body.tokenId && req.body.listingTitle && req.body.description && req.body.dateAdded && req.body.longitude && req.body.latitude && req.body.picture) {
+		if (req.body.tokenId && req.body.listingTitle && req.body.description && req.body.longitude && req.body.latitude && req.body.picture) {
 			if(req.body.bookId) {
-				Listing.insertListingWithSavedBook(req.body.tokenId, req.body.listingTitle, req.body.description, req.body.dateAdded,
+				Listing.insertListingWithSavedBook(req.body.tokenId, req.body.listingTitle, req.body.description,
 					req.body.latitude, req.body.longitude, req.body.picture, req.body.bookId, req.body.bookId,
 					(response) => {
 						if (!response.success) {
@@ -79,7 +79,7 @@ router.post('/', function(req, res, next){
 						}
 				});
 			} else if (req.body.bookTitle && req.body.author && req.body.genreId) {
-				Listing.insertListingWithNewBook(req.body.tokenId, req.body.listingTitle, req.body.description, req.body.dateAdded,
+				Listing.insertListingWithNewBook(req.body.tokenId, req.body.listingTitle, req.body.description,
 					req.body.latitude, req.body.longitude, req.body.picture, req.body.bookTitle, req.body.author, req.body.genreId,
 					(response) => {
 						if (!response.success) {
@@ -130,14 +130,14 @@ router.put('/', function (req, res, next) {
         if(!authorized)
             return;
         
-		if (!req.body.listingId || !req.body.title || !req.body.description || !req.body.dateAdded || !req.body.status || !req.body.bookId) {
+		if (!req.body.listingId || !req.body.title || !req.body.description || !req.body.status || !req.body.bookId) {
             res.status(400);
             res.send({status: 'Requested data not received!'});
         } else {
 			Token.getUserId(req.query.tokenId, (userId) => {
 				if(userId.success){
 					Listing.insertListing(req.body.listingId, req.body.title, req.body.description, 
-					req.body.dateAdded, req.body.status, userId.data, req.body.bookId,
+					req.body.status, userId.data, req.body.bookId,
 					(result) => {
 						if (!result.success) {
 							res.status(404);
