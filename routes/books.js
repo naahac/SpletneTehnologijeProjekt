@@ -3,6 +3,9 @@ var router = express.Router();
 
 var Book = require("./../models/book");
 var Token = require("./../models/token");
+var Genre = require("./../models/genre");
+var Author = require("./../models/author");
+
 var checkToken = require('../utilities/checkToken');
 
 router.get('/', function(req, res, next) {
@@ -60,6 +63,22 @@ router.get('/all', function(req, res, next) {
 	}));
 });
 
+router.get('/genres', function(req, res, next) {
+	checkToken(req.query.tokenId, res, (authorized => {
+		if(!authorized)
+            return;
+
+		Genre.getGenres((response) => {
+			if (!response.success) {
+				res.status(404);
+				res.send({status: 'No genres'});
+			} else {
+				res.json(response.data);
+			}
+		});
+	}));
+});
+
 router.get('/search', function(req, res, next) {
 	checkToken(req.query.tokenId, res, (authorized => {
 		if(!authorized)
@@ -79,6 +98,27 @@ router.get('/search', function(req, res, next) {
 				if (!response.success) {
 					res.status(404);
 					res.send({status: 'No books.'});
+				} else {
+					res.json(response.data);
+				}
+			});
+		}
+	}));
+});
+
+router.get('/authors', function(req, res, next) {
+	checkToken(req.query.tokenId, res, (authorized => {
+		if(!authorized)
+            return;
+
+		if (!req.query.author) {
+            res.status(400);
+            res.send({status: 'Requested data not received!'});
+        } else {
+			Author.search(req.query.author, (response) => {
+				if (!response.success) {
+					res.status(404);
+					res.send({status: 'No authors.'});
 				} else {
 					res.json(response.data);
 				}

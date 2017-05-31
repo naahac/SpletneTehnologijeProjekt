@@ -33,17 +33,22 @@ class Author {
         });
     }
 
-	// static updateAuthor(personId, name, surname, birthDate) {
-	// 	var index = db.authors.indexOf(this.getAuthorById(personId));
-	// 	db.authors[index] = new Author(personId, name, surname, birthDate);
-	// }
+	static search(author, callback) {
+        author = '%' + title + '%';
 
-	// static deleteAuthor(personId) {
-	// 	var index = db.authors.indexOf(this.getAuthorById(personId));
-	// 	if (index > -1) {
-	// 		db.authors.splice(index, 1);
-	// 	}
-	// }
+		new db.Authors()
+		.where('author', 'LIKE', author)
+		.fetchAll()
+		.then((models) => {
+			if(models == null)
+				callback({success: false});
+			else
+				callback({success: true, data: models});
+		})
+		.catch(() => {
+			callback({success: false});
+		});
+	}
 }
 
 module.exports = Author;

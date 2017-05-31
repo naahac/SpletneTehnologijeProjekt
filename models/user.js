@@ -37,18 +37,18 @@ class User extends Person {
                 return;
             }
 
-            let user = new User(undefined, name, surname, birthDate, username, password, email, location);
+            let user = new User(undefined, name, surname, birthDate, username, password, email);
             new db.Users(user).save(null, { method: 'insert' });
 
             callback({success:true});
         });
     }
 
-    static updateUser(personId, name, surname, birthDate, email, location, callback) {
+    static updateUser(personId, name, surname, birthDate, email, callback) {
         new db.Users({ personId: personId })
 			.save({ personId:personId, name:name, surname:surname, 
                 birthDate:birthDate,
-                email:email, location:location }, {patch: true})
+                email:email }, {patch: true})
 			.then((model) => {
 				if (model == null)
 					callback({ success: false });
