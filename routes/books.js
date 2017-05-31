@@ -60,6 +60,33 @@ router.get('/all', function(req, res, next) {
 	}));
 });
 
+router.get('/search', function(req, res, next) {
+	checkToken(req.query.tokenId, res, (authorized => {
+		if(!authorized)
+            return;
+
+		if (!req.query.title) {
+            res.status(400);
+            res.send({status: 'Requested data not received!'});
+        } else {
+			let author = null;
+
+			if(req.query.authorId){
+				author = req.query.authorId;
+			}		
+
+			Book.search(req.query.title, author, (response) => {
+				if (!response.success) {
+					res.status(404);
+					res.send({status: 'No books.'});
+				} else {
+					res.json(response.data);
+				}
+			});
+		}
+	}));
+});
+
 router.post('/', function(req, res, next){
 	checkToken(req.query.tokenId, res, (authorized => {
 		if(!authorized)

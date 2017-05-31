@@ -2,12 +2,12 @@ var db = require('../database/database');
 var Author = require('./author')
 
 class Book {
-	constructor(bookId, title, releasedate, authorId) {
+	constructor(bookId, title, genreId, authorId) {
 	    if(bookId !== null)
 		    this.bookId = bookId;
 		this.title = title;
-		this.releasedate = releasedate;
-        if(bookId !== null)
+		this.genreId = genreId;
+        if(authorId !== null)
 		    this.authorId = authorId;
 	}
 
@@ -23,6 +23,39 @@ class Book {
             .catch(() => {
                 callback({success: false});
             });
+	}
+
+    static search(title, author, callback) {
+        title = '%' + title + '%';
+
+        if(author == null){
+            new db.Books()
+            .where('title', 'LIKE', title)
+            .fetchAll()
+            .then((models) => {
+                if(models == null)
+                    callback({success: false});
+                else
+                    callback({success: true, data: models});
+            })
+            .catch(() => {
+                callback({success: false});
+            });
+        } else{
+            new db.Books()
+            .query(function(qb) {
+                qb.where('title', 'LIKE', title).orWhere('authorId', '=', author);
+            }).fetchAll()
+            .then((models) => {
+                if(models == null)
+                    callback({success: false});
+                else
+                    callback({success: true, data: models});
+            })
+            .catch((error) => {
+                callback({success: false});
+            });
+        }
 	}
 
     static getBooks(callback) {
@@ -53,25 +86,28 @@ class Book {
             });
     }
 
-    static insertBook(bookId, title, releasedate, authorId, callback) {
+    static insertBook(bookId, title, genreId, authorId, callback) {
+        let book;
+        
         if(bookId != null){
-            let book = new Book(bookId, title, releasedate, authorId);
+            book = new Book(bookId, title, genreId, authorId);
         }else{
-            let book = new Book(title, releasedate, authorId);
+            book = new Book(null, title, genreId, authorId);
         }
 
         new db.Books(book)
         .save()
-        .then(() => {
-            callback({success:true});
+        //null, {  }
+        .then((model) => {
+            callback({success:true, data: model});
         })
-        .catch(() => {
+        .catch((error) => {
             callback({success:false});
         });
     }
     
-	// static createBook(title, releasedate, authorId, callback) {
-    //     let book = new Book(undefined, title, releasedate, undefined);
+	// static createBook(title, genreId, authorId, callback) {
+    //     let book = new Book(undefined, title, genreId, undefined);
     //     new db.Books(book)
     //         .save(null, { method: 'insert' })
     //         .then(() => {
@@ -83,11 +119,11 @@ class Book {
 	// 	return false;
 	// }
 
-	// static updateBook(bookId, title, releasedate, authorId, callback) {
+	// static updateBook(bookId, title, genreId, authorId, callback) {
     //     new db.Books({bookId: bookId})
     //         .save({
     //             title: title,
-    //             releasedate:releasedate
+    //             genreId:genreId
     //         })
     //         .then(() => {
     //             callback({success:true});

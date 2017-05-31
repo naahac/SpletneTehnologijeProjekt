@@ -1,15 +1,22 @@
 var db = require('../database/database');
+
 var Book = require('./book');
-var User = require('./user')
+var Author = require('./author');
+var Picture = require('./picture');
+var Token = require('./token');
 
 class Listing { 
-  constructor(listingId, title, description, dateadded, status, userId, bookId) {
-    this.listingId = listingId;
+  constructor(listingId, title, description, dateadded, latitude, longitude, status, userId, bookId) {
+    if(listingId != null)
+        this.listingId = listingId;
     this.title = title;
     this.description = description;
     this.dateadded = dateadded;
-    this.status = status;
-    this.personId = userId;
+    this.longitude = longitude;
+    this.latitude = latitude;
+    if(status != null)
+        this.status = status;
+    this.userId = userId;
     this.bookId = bookId;
   }
 
@@ -53,11 +60,101 @@ class Listing {
             });
   }
 
-    static insertListing(listingId, title, description, dateadded, status, userId, bookId, callback) {
+    static insertListing(listingId, title, description, dateadded, latitude, longitude, userId, bookId, callback) {
+        let listing;
+
         if(listingId != null){
-            let book = new Book(listingId, title, description, dateadded, status, userId, bookId);
+            listing = new Listing(listingId, title, description, dateadded, latitude, longitude, null, userId, bookId);
         }else{
-            let book = new Book(title, description, dateadded, status, userId, bookId);
+            listing = new Listing(null, title, description, dateadded, latitude, longitude, true, userId, bookId);
+        }
+
+        new db.Listings(listing)
+        .save()
+        .then((model) => {
+            callback({success:true, data: model});
+        })
+        .catch((error) => {
+            callback({success:false});
+        });
+    }
+
+    static insertListingWithNewBook(tokenId, listingTitle, description, dateAdded, latitude, longitude, picture, bookTitle, author, genreId, callback) {
+        // TODO: Validations
+
+        // if (!this.validateLocation(longitude) || !this.validateLocation(latitude)) {
+        //     callback({success:false, status: 'Longitude or latitude format is not valid'});
+        //     return;
+        // }
+
+        Token.getUserId(tokenId, (getUserIdResponse) => {
+            if(getUserIdResponse.success){
+
+                Author.createAuthor(author, (createAuthorResponse) => {
+                    if (createAuthorResponse.success) {
+
+                        Book.insertBook(null, bookTitle, genreId, createAuthorResponse.data.get('authorId'), (insertBookResponse) => {
+                            if (insertBookResponse.success) {
+
+                                this.insertListing(null, listingTitle, description, dateAdded, latitude, longitude, getUserIdResponse.data, insertBookResponse.data.get('bookId'), (insertListingResponse) => {
+                                    if (insertListingResponse.success) {
+                                        
+                                        Picture.createPicture(picture, insertListingResponse.data.get('listingId'), (createPictureResponse) => {
+                                            callback(createPictureResponse);
+                                            return;
+                                        })
+
+                                    } else {
+                                        callback(insertListingResponse);
+                                        return;
+                                    }
+                                })
+
+                            } else {
+                                callback(insertBookResponse);
+                                return;
+                            }
+                        });
+
+                    } else {
+                        callback(createAuthorResponse);
+                        return;
+                    }
+                });
+
+                // Listing.insertListing(null, req.body.title, req.body.description, req.body.dateAdded,
+                // req.body.status, getUserIdResponse.data, req.body.bookId,
+                // (response) => {
+                //     if (!response.success) {
+                //         callback(userId);
+                //         return;
+                //     } else {
+                //         res.send('OK');
+                //     }
+                // });
+
+            } else {
+                callback(getUserIdResponse);
+                return;
+            }
+        });
+
+        // new db.Listing(book)
+        // .save()
+        // .then(() => {
+        //     callback({success:true});
+        // })
+        // .catch(() => {
+        //     callback({success:false});
+        // });
+    }
+
+    static insertListingWithSavedBook(tokenId, listingTitle, description, dateAdded, latitude, longitude, picture, bookId, callback) {
+        // TODO: Validations
+
+        if (!this.validateLocation(longitude) || !this.validateLocation(latitude)) {
+                callback({success:false, status: 'Longitude or latitude format is not valid'});
+                return;
         }
 
         new db.Listing(book)
@@ -109,6 +206,11 @@ class Listing {
         .catch( (err) => {
             callback({success:false});
         });
+    }
+
+    static validateLocation(location) {
+        var re = new RegExp("^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,6}");
+        return re.test(location);
     }
 }
 

@@ -1,10 +1,8 @@
-var Picture = require('../models/picture');
-
 var db = require('../database/database');
 
 class Picture { 
-  constructor(pictureId, picture, dateadded, listingId) {
-      if(pictureId != undefined)
+  constructor(pictureId, picture, listingId) {
+      if(pictureId != null)
           this.pictureId = pictureId;
     this.picture = picture;
     this.listingId = listingId;
@@ -23,14 +21,14 @@ class Picture {
   }
 
   static createPicture(picture, listingId, callback){
-      let pic = new Picture(undefined, picture, listingId);
+      let pic = new Picture(null, picture, listingId);
       new db.Pictures(pic)
           .save()
-          .then((result) => {
-                callback(true);
+          .then((model) => {
+                callback({success: true, data: model});
           })
           .catch((error) => {
-                callback(false);
+                callback({success: false});
           });
   }
 

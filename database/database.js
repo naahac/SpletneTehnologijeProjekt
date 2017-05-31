@@ -16,7 +16,7 @@ let Users = bookshelf.Model.extend({
         return this.hasMany(Tokens, 'personId');
     },
 	listing: function() {
-        return this.hasMany(Listings, 'personId');
+        return this.hasMany(Listings, 'userId');
     }
 });
 
@@ -38,4 +38,14 @@ let Pictures = bookshelf.Model.extend({
     idAttribute: 'pictureId'
 });
 
-module.exports = {Tokens, Users, Listings, Books, Pictures};
+let Authors = bookshelf.Model.extend({
+    tableName: 'author',
+    idAttribute: 'authorId'
+});
+
+let Genres = bookshelf.Model.extend({
+    tableName: 'genre',
+    idAttribute: 'genreId'
+});
+
+module.exports = {Tokens, Users, Listings, Books, Pictures, Authors, Genres};

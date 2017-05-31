@@ -61,33 +61,67 @@ router.get('/all', function(req, res, next) {
 });
 
 router.post('/', function(req, res, next){
-	checkToken(req.query.tokenId, res, (authorized => {
+	checkToken(req.body.tokenId, res, (authorized => {
 		if(!authorized)
             return;
-		
-		if (!req.body.title || !req.body.description || !req.body.dateAdded || !req.body.status || !req.body.bookId) {
-            res.status(400);
-            res.send({status: 'Requested data not received!'});
-        } else {
-			Token.getUserId(req.query.tokenId, (userId) => {
-				if(userId.success){
-					Listing.insertListing(null, req.body.title, req.body.description, req.body.dateAdded,
-					req.body.status, userId.data, req.body.bookId,
+
+		if (req.body.tokenId && req.body.listingTitle && req.body.description && req.body.dateAdded && req.body.longitude && req.body.latitude && req.body.picture) {
+			if(req.body.bookId) {
+				Listing.insertListingWithSavedBook(req.body.tokenId, req.body.listingTitle, req.body.description, req.body.dateAdded,
+					req.body.latitude, req.body.longitude, req.body.picture, req.body.bookId, req.body.bookId,
 					(response) => {
 						if (!response.success) {
 							res.status(404);
-							res.send('Error while inserting data!');
+							res.send({success: false, status: 'Error while inserting data'});
 						}
 						else {
-							res.send('OK');
+							res.send({success: true});
 						}
-					});
-				} else {
-					res.status(404);
-					res.send('Error while getting your user data!');
-				}
-			});
-		}		
+				});
+			} else if (req.body.bookTitle && req.body.author && req.body.genreId) {
+				Listing.insertListingWithNewBook(req.body.tokenId, req.body.listingTitle, req.body.description, req.body.dateAdded,
+					req.body.latitude, req.body.longitude, req.body.picture, req.body.bookTitle, req.body.author, req.body.genreId,
+					(response) => {
+						if (!response.success) {
+							res.status(404);
+							res.send({success: false, status: 'Error while inserting data'});
+						}
+						else {
+							res.send({success: true});
+						}
+				});
+			} else {
+				res.status(400);
+            	res.send({status: 'Requested data not received!'});
+			}
+		} else {
+			res.status(400);
+            res.send({status: 'Requested data not received!'});
+		}
+		
+		// if (!req.body.title || !req.body.description || !req.body.dateAdded || !req.body.status || !req.body.bookId) {
+        //     res.status(400);
+        //     res.send({status: 'Requested data not received!'});
+        // } else {
+		// 	Token.getUserId(req.query.tokenId, (userId) => {
+		// 		if(userId.success){
+		// 			Listing.insertListing(null, req.body.title, req.body.description, req.body.dateAdded,
+		// 			req.body.status, userId.data, req.body.bookId,
+		// 			(response) => {
+		// 				if (!response.success) {
+		// 					res.status(404);
+		// 					res.send('Error while inserting data!');
+		// 				}
+		// 				else {
+		// 					res.send('OK');
+		// 				}
+		// 			});
+		// 		} else {
+		// 			res.status(404);
+		// 			res.send('Error while getting your user data!');
+		// 		}
+		// 	});
+		// }		
 	}));
 });
 

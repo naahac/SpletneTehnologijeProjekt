@@ -9,14 +9,20 @@ class Token {
 	}
 
 	static login(userId, callback) {
-		this.getActiveTokenIdByUserId(userId, (result) => {
-			if (!result.success) {
-				this.createToken(userId, (result) => {
-					callback(result);
-				});
-			}else
+		this.logoutByUserId(userId, (result) => {
+			this.createToken(userId, (result) => {
 				callback(result);
+			});
 		});
+
+		// this.getActiveTokenIdByUserId(userId, (result) => {
+		// 	if (!result.success) {
+		// 		this.createToken(userId, (result) => {
+		// 			callback(result);
+		// 		});
+		// 	}else
+		// 		callback(result);
+		// });
 	}
 
 	static logout(tokenId, callback) {
@@ -25,8 +31,23 @@ class Token {
 			.then((model) => {
 				if (model == null)
 					callback({ success: false });
+				else
+					callback({ success: true });
+			})
+			.catch((err) => {
+				callback({ success: false });
+			});
+	}
 
-				callback({ success: true });
+	static logoutByUserId(personId, callback) {
+		new db.Tokens()
+			.where('personId', personId)
+			.save({ active: false }, {patch: true})
+			.then((model) => {
+				if (model == null)
+					callback({ success: false });
+                else
+				    callback({ success: true });
 			})
 			.catch((err) => {
 				callback({ success: false });

@@ -93,12 +93,12 @@ router.post('/', function (req, res, next) {
     }else{
         User.createUser(req.body.name, req.body.surname, req.body.birthDate, req.body.username, req.body.password, req.body.email, req.body.location,
             (result) => {
-                if (!result) {
+                if (!result.success) {
                     res.status(404);
-                    res.send('Error while inserting data!');
+                    res.send({status: result.status});
                 }
                 else {
-                    res.send('OK');
+                    res.send({status: 'OK'});
                 }
             });
     }

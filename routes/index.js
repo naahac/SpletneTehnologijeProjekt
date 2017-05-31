@@ -31,6 +31,10 @@ router.post('/login', function (req, res, next) {
     }
 });
 
+function getUserIdByLoginDataCallback(result) {
+    
+}
+
 router.post('/logout', function (req, res, next) {
 	if (req.body.tokenId) {
 		Token.logout(req.body.tokenId, (result) => {
