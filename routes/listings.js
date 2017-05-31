@@ -68,7 +68,7 @@ router.post('/', function(req, res, next){
 		if (req.body.tokenId && req.body.listingTitle && req.body.description && req.body.longitude && req.body.latitude && req.body.picture) {
 			if(req.body.bookId) {
 				Listing.insertListingWithSavedBook(req.body.tokenId, req.body.listingTitle, req.body.description,
-					req.body.latitude, req.body.longitude, req.body.picture, req.body.bookId, req.body.bookId,
+					req.body.latitude, req.body.longitude, req.body.picture, req.body.bookId,
 					(response) => {
 						if (!response.success) {
 							res.status(404);

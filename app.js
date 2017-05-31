@@ -9,14 +9,15 @@ var index = require('./routes/index');
 var users = require('./routes/users');
 var books = require('./routes/books');
 var listings = require('./routes/listings');
+var bodyParser = require('body-parser')
 // var userPreferences = require('./routes/userPreferences');
-// var pictures = require('./routes/pictures');
+var pictures = require('./routes/pictures');
 
 var app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-
+app.use(bodyParser({limit: '50mb'}));
 app.use(function (req, res, next) {
 
     // Website you wish to allow to connect
@@ -49,7 +50,7 @@ app.use('/users', users);
  app.use('/books', books);
 app.use('/listings', listings);
 // app.use('/userpreferences', userPreferences);
-// app.use('/pictures', pictures);
+app.use('/pictures', pictures);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

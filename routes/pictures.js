@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 var Picture = require("./../models/picture");
-var util = require('./utilities');
+
 
 router.get('/:listingId', function(req, res, next) {
     // util.checkToken(req.query.tokenId, res);
