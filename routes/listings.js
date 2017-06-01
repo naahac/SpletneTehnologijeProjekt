@@ -54,6 +54,33 @@ router.get('/all', function(req, res, next) {
 	}));
 });
 
+router.get('/search', function(req, res, next) {
+	checkToken(req.query.tokenId, res, (checkTokenResponse => {
+        if(!checkTokenResponse.success)
+            return;
+
+		let latitude = null, longitude = null, title = null;
+
+		if(req.query.latitude && req.query.longitude) {
+			latitude = req.query.latitude;
+			longitude = req.query.longitude;
+		}
+
+		if(req.query.title) {
+			title = req.query.title;
+		}
+
+		Listing.search(checkTokenResponse.data.get('personId'), latitude, longitude, title, (response) => {
+			if (!response.success) {
+				res.status(404);
+				res.send({success: false, status: 'Listings not found'});
+			} else {
+				res.json(response);
+			}
+		});
+	}));
+});
+
 router.post('/', function(req, res, next){
 	checkToken(req.body.tokenId, res, (checkTokenResponse => {
         if(!checkTokenResponse.success)

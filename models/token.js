@@ -37,7 +37,7 @@ class Token {
 	static logoutByUserId(personId, callback) {
 		new db.Tokens()
 			.where('personId', personId)
-			.save({ active: false }, {patch: true})
+			.save({ active: false }, {patch: true, require: false})
 			.then((model) => {
 				if (model == null)
 					callback({ success: false });
