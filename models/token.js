@@ -10,19 +10,14 @@ class Token {
 
 	static login(userId, callback) {
 		this.logoutByUserId(userId, (result) => {
-			this.createToken(userId, (result) => {
+			if(result.success){
+				this.createToken(userId, (createTokenResponse) => {
+				callback(createTokenResponse);
+				});
+			} else {
 				callback(result);
-			});
+			}
 		});
-
-		// this.getActiveTokenIdByUserId(userId, (result) => {
-		// 	if (!result.success) {
-		// 		this.createToken(userId, (result) => {
-		// 			callback(result);
-		// 		});
-		// 	}else
-		// 		callback(result);
-		// });
 	}
 
 	static logout(tokenId, callback) {
@@ -61,7 +56,7 @@ class Token {
 		new db.Tokens(token)
 			.save(null, { method: 'insert' })
 			.then((model) => {
-				callback({ success: true, data: tokenId });
+				callback({ success: true, data: model });
 			})
 			.catch((err) => {
 				callback({ success: false });

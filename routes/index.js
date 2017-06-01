@@ -16,14 +16,14 @@ router.post('/login', function (req, res, next) {
         User.getUserIdByLoginData(req.body.username, req.body.password, (result) => {
             if (!result.success) {
                 res.status(404);
-                res.send({ status: 'User not found' });
+                res.send({success: false, status: 'User not found' });
             }else{
                 Token.login(result.data, (result) => {
                     if (!result.success) {
                         res.status(404);
-                        res.send({ status: 'Encountered error while logging in' });
-                    }else{
-                        res.json(result.data);
+                        res.send({success: false, status: 'Encountered error while logging in' });
+                    } else {
+                        res.json(data);
                     }
                 });
             }
@@ -31,19 +31,14 @@ router.post('/login', function (req, res, next) {
     }
 });
 
-function getUserIdByLoginDataCallback(result) {
-    
-}
-
 router.post('/logout', function (req, res, next) {
 	if (req.body.tokenId) {
 		Token.logout(req.body.tokenId, (result) => {
-			res.json(result.success);
+			res.json(result);
 		});
-	}
-	else {
+	} else {
 		res.status(400);
-		res.send({ status: 'Token not received' });
+		res.send({success: false, status: 'Token not received' });
 	}
 });
 
