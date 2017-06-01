@@ -77,28 +77,16 @@ class Listing {
         .where('status', true)
         .fetchAll({withRelated: ['book', 'book.author', 'book.genre']})
         .then((results) => {
-            if(results == null)
+            if(results.length == 0)
                 callback({success: false});
             else if (!latitude || !longitude)
                 callback({success: true, data: results});
             else {
-
-                var sortable = [];
                 var json = results.serialize();
-
-                // results.models.forEach((model) => {
-                //     // model.set('distance') = Location.getDistance(latitude, longitude, model.get('latitude'), model.get('longitude'));
-                // });
 
                 json.forEach((model) => {
                     model.distance = this.getDistance(latitude, longitude, model.latitude, model.longitude);
                 });
-
-                // for (var model in json) {
-                //     //model.distance = Location.getDistance(latitude, longitude, model.get('latitude'), model.get('longitude'));
-                //     model.distance = 1;
-                //     //sortable.push()
-                // }
 
                 json.sort((a, b) => {
                     return a.distance - b.distance;
@@ -110,35 +98,6 @@ class Listing {
         .catch((error) => {
             callback({success: false});
         });
-
-        // if(author == null){
-        //     new db.Books()
-        //     .where('title', 'LIKE', title)
-        //     .fetchAll({withRelated: ['author']})
-        //     .then((models) => {
-        //         if(models == null)
-        //             callback({success: false});
-        //         else
-        //             callback({success: true, data: models});
-        //     })
-        //     .catch((error) => {
-        //         callback({success: false});
-        //     });
-        // } else{
-        //     new db.Books()
-        //     .query(function(qb) {
-        //         qb.where('title', 'LIKE', title).where('authorId', author);
-        //     }).fetchAll()
-        //     .then((models) => {
-        //         if(models == null)
-        //             callback({success: false});
-        //         else
-        //             callback({success: true, data: models});
-        //     })
-        //     .catch((error) => {
-        //         callback({success: false});
-        //     });
-        // }
 	}
 
     static insertListing(listingId, title, description, latitude, longitude, location, userId, bookId, callback) {
