@@ -40,13 +40,17 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on('messageToServer', function (chatId, senderId, receiverId, message) {
-		Message.createMessage(message, chatId, senderId, (response) => {
-			if (response.success) {
-				io.to(clients[receiverId]).emit('messageToClient', message, chatId);
-			} else {
-				io.to(clients[senderId]).emit('messageToClient', null, chatId);
-			}
-		});
+		if(!chatId || !senderId || !receiverId) {
+			io.to(clients[senderId]).emit('messageToClient', null, chatId);
+		} else {
+			Message.createMessage(message, chatId, senderId, (response) => {
+				if (response.success) {
+					io.to(clients[receiverId]).emit('messageToClient', message, chatId);
+				} else {
+					io.to(clients[senderId]).emit('messageToClient', null, chatId);
+				}
+			});
+		}
 	});
 });
 

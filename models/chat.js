@@ -21,6 +21,20 @@ class Chat {
         });
     }
 
+	static chatExists(chatId, callback) {
+        new db.Chats({chatId: chatId})
+        .fetch()
+        .then((model) => {
+            if(model == null)
+                callback({success: false});
+            else
+                callback({success: true});
+        })
+        .catch((error) => {
+            callback({success: false});
+        });
+    }
+
 	static getChatId(user1, user2, callback) {
         new db.Chats()
         .where({user1: user1, user2: user2})

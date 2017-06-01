@@ -1,5 +1,7 @@
 var db = require('../database/database');
 
+var Chat = require('./chat');
+
 class Message {
 	constructor(message, chatId, userId) {
 		this.message = message;
@@ -11,14 +13,20 @@ class Message {
 	static createMessage(message, chatId, userId, callback) {
 		let msg = new Message(message, chatId, userId);
 
-		new db.Messages(msg)
-        .save()
-        .then(() => {
-			callback({success: true});
-        })
-        .catch((error) => {
-            callback({success: false});
-        });
+		Chat.chatExists(chatId, response => {
+			if(!response.success) {
+				callback({success: false});
+			} else {
+				new db.Messages(msg)
+				.save()
+				.then(() => {
+					callback({success: true});
+				})
+				.catch((error) => {
+					callback({success: false});
+				});
+			}
+		});
 	}
 }
 
