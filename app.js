@@ -14,11 +14,8 @@ var bodyParser = require('body-parser')
 // var userPreferences = require('./routes/userPreferences');
 var pictures = require('./routes/pictures');
 
-var Chat = require("./models/chat");
-
 var app = express();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -40,19 +37,6 @@ app.use(function (req, res, next) {
 
 	// Pass to next layer of middleware
 	next();
-});
-
-//chat
-var clients = []
-
-io.on('connection', function (socket) {
-	socket.on('connect', function (userId, chatId) {
-		clients[userId] = socket.id;
-	});
-
-	socket.on('messageToServer', function (chatId, senderId, receiverId, message) {
-		io.to(clients[receiverId]).emit('messageToClient', message, chatId);
-	});
 });
 
 // uncomment after placing your favicon in /public

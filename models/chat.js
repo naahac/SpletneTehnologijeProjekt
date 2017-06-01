@@ -7,39 +7,64 @@ class Chat {
 		this.date = Date.now();
 	}
 
-	// static getChat(listingId, callback) {
-    //     new db.Listings()
-    //     .where({listingId: listingId, status: true})
-    //     .fetch({withRelated: ['book', 'book.author', 'book.genre']})
-    //     .then((model) => {
-    //         if(model == null)
-    //             callback({success: false});
-    //         else
-    //             callback({success: true, data: model});
-    //     })
-    //     .catch((error) => {
-    //         callback({success: false});
-    //     });
-    // }
+	static getChat(chatId, callback) {
+        new db.Chats({chatId: chatId})
+        .fetch({withRelated: ['message']})
+        .then((model) => {
+            if(model == null)
+                callback({success: false});
+            else
+                callback({success: true, data: model});
+        })
+        .catch((error) => {
+            callback({success: false});
+        });
+    }
 
-	static createChat() {
-		
+	static getChatId(user1, user2, callback) {
+        new db.Chats()
+        .where({user1: user1, user2: user2})
+		.orWhere({user1: user2, user2: user1})
+        .fetch()
+        .then((model) => {
+            if(model == null)
+                callback({success: false});
+            else
+                callback({success: true, data: model.get('chatId')});
+        })
+        .catch((error) => {
+            callback({success: false});
+        });
+    }
+
+	static getChatsByUserId(userId, callback) {
+        new db.Chats()
+        .where({user1: userId})
+		.orWhere({user2: userId})
+        .fetchAll()
+        .then((models) => {
+            if(models.length == 0)
+                callback({success: false});
+            else
+                callback({success: true, data: models});
+        })
+        .catch((error) => {
+            callback({success: false});
+        });
+    }
+
+	static createChat(user1, user2, callback) {
+		let chat = new Chat(user1, user2);
+
+		new db.Chats(chat)
+        .save()
+        .then((model) => {
+			callback({success: true, data: model.get('chatId')});
+        })
+        .catch((error) => {
+            callback({success: false});
+        });
 	}
-
-	// static getChatById(chatId) {
-	// 	return db.chats.find(function (o) { return o.chatId == chatId; });
-	// }
-
-	// static createChat(chat, dateadded, listingID) {
-	// 	db.chats.push(new Chat(chatsId++, chat, dateadded, listingID))
-	// }
-
-	// static deleteChat(chatId) {
-	// 	var index = db.chats.indexOf(this.getChatById(chatId));
-	// 	if (index > -1) {
-	// 		db.chats.splice(index, 1);
-	// 	}
-	// }
 }
 
 module.exports = Chat;

@@ -88,4 +88,4 @@ let Messages = bookshelf.Model.extend({
     }
 });
 
-module.exports = {Tokens, Users, Listings, Books, Pictures, Authors, Genres};
+module.exports = {Tokens, Users, Listings, Books, Pictures, Authors, Genres, Chats, Messages};
