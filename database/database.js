@@ -72,4 +72,20 @@ let Genres = bookshelf.Model.extend({
     }
 });
 
+let Chats = bookshelf.Model.extend({
+    tableName: 'chat',
+    idAttribute: 'chatId',
+    message: function (){
+        return this.hasMany(Messages, 'messageId');
+    }
+});
+
+let Messages = bookshelf.Model.extend({
+    tableName: 'message',
+    idAttribute: 'messageId',
+    chat: function (){
+        return this.belongsTo(Chats, 'chatId');
+    }
+});
+
 module.exports = {Tokens, Users, Listings, Books, Pictures, Authors, Genres};
