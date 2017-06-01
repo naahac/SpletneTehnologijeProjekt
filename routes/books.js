@@ -9,8 +9,8 @@ var Author = require("./../models/author");
 var checkToken = require('../utilities/checkToken');
 
 router.get('/', function(req, res, next) {
-	checkToken(req.query.tokenId, res, (authorized => {
-		if(!authorized)
+	checkToken(req.query.tokenId, res, (checkTokenResponse => {
+        if(!checkTokenResponse.success)
             return;
 
 		Book.getBook(req.body.bookId, (response) => {
@@ -25,8 +25,8 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/byuserid', function(req, res, next) {
-	checkToken(req.query.tokenId, res, (authorized => {
-		if(!authorized)
+	checkToken(req.query.tokenId, res, (checkTokenResponse => {
+        if(!checkTokenResponse.success)
             return;
 
         Token.getUserId(req.query.tokenId, (userId) => {
@@ -48,8 +48,8 @@ router.get('/byuserid', function(req, res, next) {
 });
 
 router.get('/all', function(req, res, next) {
-	checkToken(req.query.tokenId, res, (authorized => {
-		if(!authorized)
+	checkToken(req.query.tokenId, res, (checkTokenResponse => {
+        if(!checkTokenResponse.success)
             return;
 
 		Book.getBooks((response) => {
@@ -64,8 +64,8 @@ router.get('/all', function(req, res, next) {
 });
 
 router.get('/genres', function(req, res, next) {
-	checkToken(req.query.tokenId, res, (authorized => {
-		if(!authorized)
+	checkToken(req.query.tokenId, res, (checkTokenResponse => {
+        if(!checkTokenResponse.success)
             return;
 
 		Genre.getGenres((response) => {
@@ -80,8 +80,8 @@ router.get('/genres', function(req, res, next) {
 });
 
 router.get('/search', function(req, res, next) {
-	checkToken(req.query.tokenId, res, (authorized => {
-		if(!authorized)
+	checkToken(req.query.tokenId, res, (checkTokenResponse => {
+        if(!checkTokenResponse.success)
             return;
 
 		if (!req.query.title) {
@@ -107,8 +107,8 @@ router.get('/search', function(req, res, next) {
 });
 
 router.get('/authors', function(req, res, next) {
-	checkToken(req.query.tokenId, res, (authorized => {
-		if(!authorized)
+	checkToken(req.query.tokenId, res, (checkTokenResponse => {
+        if(!checkTokenResponse.success)
             return;
 
 		if (!req.query.author) {
@@ -128,8 +128,8 @@ router.get('/authors', function(req, res, next) {
 });
 
 router.post('/', function(req, res, next){
-	checkToken(req.query.tokenId, res, (authorized => {
-		if(!authorized)
+	checkToken(req.body.tokenId, res, (checkTokenResponse => {
+        if(!checkTokenResponse.success)
             return;
 		
 		if (!req.body.title || !req.body.releasedate || !req.body.authorId) {
@@ -151,8 +151,8 @@ router.post('/', function(req, res, next){
 });
 
 router.put('/', function (req, res, next) {
-    checkToken(req.query.tokenId, res, (authorized => {
-        if(!authorized)
+    checkToken(req.body.tokenId, res, (checkTokenResponse => {
+        if(!checkTokenResponse.success)
             return;
         
 		if (!req.body.bookId || !req.body.title || !req.body.releasedate || !req.body.authorId) {
@@ -174,8 +174,8 @@ router.put('/', function (req, res, next) {
 });
 
 router.delete('/', function (req, res, next) {
-	checkToken(req.query.tokenId, res, (authorized => {
-		if(!authorized)
+	checkToken(req.body.tokenId, res, (checkTokenResponse => {
+        if(!checkTokenResponse.success)
             return;
 
 		Book.deleteBook(req.body.bookId, (response) => {

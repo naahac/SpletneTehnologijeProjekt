@@ -10,7 +10,7 @@ class Picture {
 
   static getPicturesByListingId(listingId, callback) {
       new db.Pictures()
-          .where('listingId', '=', listingId)
+          .where('listingId', listingId)
           .fetch()
           .then((model) => {
               if (model === null)
@@ -22,14 +22,26 @@ class Picture {
 
   static createPicture(picture, listingId, callback){
       let pic = new Picture(null, picture, listingId);
-      new db.Pictures(pic)
-          .save()
-          .then((model) => {
-                callback({success: true, data: model});
-          })
-          .catch((error) => {
-                callback({success: false});
-          });
+
+      new db.Pictures({listingId: listingId})
+        .fetch()
+        .then((existingModel) => {
+			if(existingModel == null) {		
+                new db.Pictures(pic)
+                .save()
+                .then(() => {
+                        callback({success: true});
+                })
+                .catch((error) => {
+                        callback({success: false});
+                });
+			} else {
+				callback({success:true});
+			}
+        })
+        .catch((error) => {
+            callback({success:false});
+        });
   }
 
   static deletePicture(pictureId) {

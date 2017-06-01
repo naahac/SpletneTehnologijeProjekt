@@ -1,12 +1,5 @@
-var Person = require('./person.js');
-
 var db = require('../database/database');
 
-// class Author extends Person {
-// 	constructor(personId, name, surname, birthDate, pseudonym) {
-// 		super(personId, name, surname, birthDate);
-// 		this.pseudonym = pseudonym;
-// 	}
 class Author {
 	constructor(authorId, author) {
 		//super(personId, name, surname, birthDate);
@@ -24,9 +17,20 @@ class Author {
 
 	static createAuthor(author, callback) {
         new db.Authors({author: author})
-        .save()
-        .then((model) => {
-            callback({success:true, data: model});
+        .fetch()
+        .then((existingModel) => {
+			if(existingModel == null) {
+				new db.Authors({author: author})
+				.save()
+				.then((model) => {
+					callback({success:true, data: model});
+				})
+				.catch((error) => {
+					callback({success:false});
+				});
+			} else {
+				callback({success:true, data: existingModel});
+			}
         })
         .catch((error) => {
             callback({success:false});

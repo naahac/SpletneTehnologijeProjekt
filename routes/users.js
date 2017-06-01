@@ -4,53 +4,39 @@ var router = express.Router();
 var checkToken = require('../utilities/checkToken');
 
 var User = require('../models/user');
-var Token = require('../models/token');
 
 router.get('/', function (req, res, next) {
-    checkToken(req.query.tokenId, res, (authorized => {
-        if(!authorized)
+    checkToken(req.query.tokenId, res, (checkTokenResponse => {
+        if(!checkTokenResponse.success)
             return;
-        Token.getActiveToken(req.query.tokenId, (result) => {
-            if (!result.success) {
+
+        User.getUser(checkTokenResponse.data.get('personId'), (getUserResponse) => {
+            if (getUserResponse === null) {
                 res.status(404);
-                res.send({status: 'Token not found!'});
+                res.send({success: false, status: 'User not found'});
             } else {
-                User.getUser(result.data.get('personId'), (user) => {
-                    if (user === null) {
-                        res.status(404);
-                        res.send({status: 'User not found'});
-                    } else {
-                        res.json(user);
-                    }
-                });
+                res.json(getUserResponse);
             }
         });
     }));
 });
 
 router.put('/', function (req, res, next) {
-    checkToken(req.query.tokenId, res, (authorized => {
-        if(!authorized)
+    checkToken(req.body.tokenId, res, (checkTokenResponse => {
+        if(!checkTokenResponse.success)
             return;
-        if (!req.body.name || !req.body.surname || !req.body.password || !req.body.birthDate || !req.body.email || !req.body.location) {
+
+        if (!req.body.name || !req.body.surname || !req.body.password || !req.body.birthDate || !req.body.email) {
             res.status(400);
-            res.send({status: 'Requested data not received!'});
+            res.send({success: false, status: 'Requested data not received!'});
         } else {
-            Token.getActiveToken(req.query.tokenId, (result) => {
-                if (!result.success) {
-                    res.status(400);
-                    res.send({status: 'User was not found!'});
-                }else{
-                    User.updateUser(result.data.attributes.personId, req.body.name, req.body.surname, req.body.birthDate, req.body.email, req.body.location,
-                        (result) => {
-                            if (!result.success) {
-                                res.status(404);
-                                res.send({status: 'Error while updating!'});
-                            }
-                            else {
-                                res.send({status: 'OK'});
-                            }
-                        });
+            User.updateUser(checkTokenResponse.data.get('personId'), req.body.name, req.body.surname, req.body.birthDate, req.body.email,
+            (updateUserResponse) => {
+                if (!updateUserResponse.success) {
+                    res.status(404);
+                    res.send({success: false, status: 'Error while updating!'});
+                } else {
+                    res.send({success: true});
                 }
             });
         }
@@ -58,28 +44,21 @@ router.put('/', function (req, res, next) {
 });
 
 router.put('/changePassword', function (req, res, next) {
-    checkToken(req.query.tokenId, res, (authorized => {
-        if(!authorized)
+    checkToken(req.body.tokenId, res, (checkTokenResponse => {
+        if(!checkTokenResponse.success)
             return;
+
         if (!req.body.oldPassword || !req.body.newPassword) {
             res.status(400);
-            res.send({status: 'Requested data not received!'});
+            res.send({success: false, status: 'Requested data not received!'});
         } else {
-            Token.getActiveToken(req.query.tokenId, (result) => {
-                if (!result.success) {
-                    res.status(400);
-                    res.send({status: 'User was not found!'});
-                }else{
-                    User.changePassword(result.data.attributes.personId, req.body.oldPassword, req.body.newPassword,
-                        (result) => {
-                            if (!result.success) {
-                                res.status(404);
-                                res.send({status: 'Error while updating!'});
-                            }
-                            else {
-                                res.send({status: 'OK'});
-                            }
-                        });
+            User.changePassword(checkTokenResponse.data.get('personId'), req.body.oldPassword, req.body.newPassword,
+            (changePasswordResponse) => {
+                if (!changePasswordResponse.success) {
+                    res.status(404);
+                    res.send({success: false, status: 'Error while updating!'});
+                } else {
+                    res.send({success: true});
                 }
             });
         }
@@ -87,41 +66,33 @@ router.put('/changePassword', function (req, res, next) {
 });
 
 router.post('/', function (req, res, next) {
-    if (!req.body.name || !req.body.surname || !req.body.username || !req.body.password || !req.body.birthDate || !req.body.email || !req.body.location) {
+    if (!req.body.name || !req.body.surname || !req.body.username || !req.body.password || !req.body.birthDate || !req.body.email) {
         res.status(400);
         res.send({status: 'Requested data not received!'});
-    }else{
-        User.createUser(req.body.name, req.body.surname, req.body.birthDate, req.body.username, req.body.password, req.body.email, req.body.location,
-            (result) => {
-                if (!result.success) {
-                    res.status(404);
-                    res.send({status: result.status});
-                }
-                else {
-                    res.send({status: 'OK'});
-                }
-            });
+    } else {
+        User.createUser(req.body.name, req.body.surname, req.body.birthDate, req.body.username, req.body.password, req.body.email,
+        (createUserResponse) => {
+            if (!createUserResponse.success) {
+                res.status(404);
+                res.send({success: false, status: createUserResponse.status});
+            } else {
+                res.send({success: true});
+            }
+        });
     }
 });
 
 router.delete('/', function (req, res, next) {
-    checkToken(req.body.tokenId, res, (authorized) => {
-        if(!authorized)
+    checkToken(req.body.tokenId, res, (checkTokenResponse) => {
+        if(!checkTokenResponse.success)
             return;
-        Token.getActiveToken(req.body.tokenId, (result) => {
-            if (!result.success) {
-                res.status(400);
-                res.send({status: 'Token was not found!'});
-            }else {
-                User.deleteUser(result.data.get('personId'), (result) => {
-                    if (!result.success) {
-                        res.status(404);
-                        res.send('Error while deleting data!');
-                    }
-                    else {
-                        res.send({status: 'OK'});
-                    }
-                });
+
+        User.deleteUser(checkTokenResponse.data.get('personId'), (deleteUserResponse) => {
+            if (!deleteUserResponse.success) {
+                res.status(404);
+                res.send({success: false, status: 'Error while deleting data!'});
+            } else {
+                res.send({success: true});
             }
         });
     });

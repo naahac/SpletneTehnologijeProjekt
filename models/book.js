@@ -95,43 +95,26 @@ class Book {
             book = new Book(null, title, genreId, authorId);
         }
 
-        new db.Books(book)
-        .save()
-        //null, {  }
-        .then((model) => {
-            callback({success:true, data: model});
+        new db.Books({title: title})
+        .fetch()
+        .then((existingModel) => {
+            if(existingModel == null) {
+                new db.Books(book)
+                .save() //null, {  }
+                .then((model) => {
+                    callback({success:true, data: model});
+                })
+                .catch((error) => {
+                    callback({success:false});
+                });
+            } else {
+                callback({success:true, data: existingModel});
+            }
         })
         .catch((error) => {
             callback({success:false});
         });
     }
-    
-	// static createBook(title, genreId, authorId, callback) {
-    //     let book = new Book(undefined, title, genreId, undefined);
-    //     new db.Books(book)
-    //         .save(null, { method: 'insert' })
-    //         .then(() => {
-    //             callback({success:true});
-    //         })
-    //         .catch(() => {
-    //             callback({success: false})
-    //         });
-	// 	return false;
-	// }
-
-	// static updateBook(bookId, title, genreId, authorId, callback) {
-    //     new db.Books({bookId: bookId})
-    //         .save({
-    //             title: title,
-    //             genreId:genreId
-    //         })
-    //         .then(() => {
-    //             callback({success:true});
-    //         })
-    //         .catch(() => {
-    //             callback({success: false})
-    //         });
-	// }
 
 	static deleteBook(bookId, callback) {
         new db.Books({bookId: bookId})

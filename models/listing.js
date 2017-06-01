@@ -6,7 +6,7 @@ var Picture = require('./picture');
 var Token = require('./token');
 
 class Listing { 
-  constructor(listingId, title, description, latitude, longitude, status, userId, bookId) {
+  constructor(listingId, title, description, latitude, longitude, location, userId, bookId) {
     if(listingId != null)
         this.listingId = listingId;
     this.title = title;
@@ -14,15 +14,15 @@ class Listing {
     this.dateadded = Date.now();
     this.longitude = longitude;
     this.latitude = latitude;
-    if(status != null)
-        this.status = status;
+    this.location = location;
+    this.status = true;
     this.userId = userId;
     this.bookId = bookId;
   }
 
   static getListing(listingId, callback) {
         new db.Listings()
-        .where({listingId: listingId})
+        .where({listingId: listingId, status: true})
         .fetch({withRelated: ['book', 'book.author', 'book.genre']})
         .then((model) => {
             if(model == null)
@@ -37,6 +37,7 @@ class Listing {
 
     static getListings(callback) {
         new db.Listings()
+            .where({status: true})
             .fetchAll({withRelated: ['book', 'book.author', 'book.genre']})
             .then((models) => {
                 if(models == null)
@@ -51,7 +52,7 @@ class Listing {
 
   static getListingsByUserId(userId, callback) {
         new db.Listings()
-        .where('userId', userId)
+        .where({userId: userId, status: true})
         .fetchAll({withRelated: ['book', 'book.author', 'book.genre']})
         .then((models) => {
             if(models == null)
@@ -64,13 +65,13 @@ class Listing {
         });
   }
 
-    static insertListing(listingId, title, description, latitude, longitude, userId, bookId, callback) {
+    static insertListing(listingId, title, description, latitude, longitude, location, userId, bookId, callback) {
         let listing;
 
-        if(listingId != null){
-            listing = new Listing(listingId, title, description, latitude, longitude, null, userId, bookId);
-        }else{
-            listing = new Listing(null, title, description, latitude, longitude, true, userId, bookId);
+        if(listingId != null) {
+            listing = new Listing(listingId, title, description, latitude, longitude, location, userId, bookId);
+        } else {
+            listing = new Listing(null, title, description, latitude, longitude, location, userId, bookId);
         }
 
         new db.Listings(listing)
@@ -83,7 +84,7 @@ class Listing {
         });
     }
 
-    static insertListingWithNewBook(tokenId, listingTitle, description, latitude, longitude, picture, bookTitle, author, genreId, callback) {
+    static insertListingWithNewBook(listingId, userId, listingTitle, description, latitude, longitude, location, picture, bookTitle, author, genreId, callback) {
         // TODO: Validations
 
         // if (!this.validateLocation(longitude) || !this.validateLocation(latitude)) {
@@ -91,49 +92,41 @@ class Listing {
         //     return;
         // }
 
-        Token.getUserId(tokenId, (getUserIdResponse) => {
-            if(getUserIdResponse.success){
+        Author.createAuthor(author, (createAuthorResponse) => {
+            if (createAuthorResponse.success) {
 
-                Author.createAuthor(author, (createAuthorResponse) => {
-                    if (createAuthorResponse.success) {
+                Book.insertBook(null, bookTitle, genreId, createAuthorResponse.data.get('authorId'), (insertBookResponse) => {
+                    if (insertBookResponse.success) {
 
-                        Book.insertBook(null, bookTitle, genreId, createAuthorResponse.data.get('authorId'), (insertBookResponse) => {
-                            if (insertBookResponse.success) {
-
-                                this.insertListing(null, listingTitle, description, latitude, longitude, getUserIdResponse.data, insertBookResponse.data.get('bookId'), (insertListingResponse) => {
-                                    if (insertListingResponse.success) {
-                                        
-                                        Picture.createPicture(picture, insertListingResponse.data.get('listingId'), (createPictureResponse) => {
-                                            callback(createPictureResponse);
-                                            return;
-                                        })
-
-                                    } else {
-                                        callback(insertListingResponse);
-                                        return;
-                                    }
+                        this.insertListing(listingId, listingTitle, description, latitude, longitude, location, userId, insertBookResponse.data.get('bookId'), (insertListingResponse) => {
+                            if (insertListingResponse.success) {
+                                
+                                Picture.createPicture(picture, insertListingResponse.data.get('listingId'), (createPictureResponse) => {
+                                    callback(createPictureResponse);
+                                    return;
                                 })
 
                             } else {
-                                callback(insertBookResponse);
+                                callback(insertListingResponse);
                                 return;
                             }
-                        });
+                        })
 
                     } else {
-                        callback(createAuthorResponse);
+                        callback(insertBookResponse);
                         return;
                     }
                 });
 
             } else {
-                callback(getUserIdResponse);
+                callback(createAuthorResponse);
                 return;
             }
         });
+
     }
 
-    static insertListingWithSavedBook(tokenId, listingTitle, description, latitude, longitude, picture, bookId, callback) {
+    static insertListingWithSavedBook(listingId, userId, listingTitle, description, latitude, longitude, location, picture, bookId, callback) {
         // TODO: Validations
 
         // if (!this.validateLocation(longitude) || !this.validateLocation(latitude)) {
@@ -141,63 +134,25 @@ class Listing {
         //         return;
         // }
 
-        Token.getUserId(tokenId, (getUserIdResponse) => {
-            if(getUserIdResponse.success){
-
-                this.insertListing(null, listingTitle, description, latitude, longitude, getUserIdResponse.data, bookId, (insertListingResponse) => {
-                    if (insertListingResponse.success) {
-                        
-                        Picture.createPicture(picture, insertListingResponse.data.get('listingId'), (createPictureResponse) => {
-                            callback(createPictureResponse);
-                            return;
-                        })
-
-                    } else {
-                        callback(insertListingResponse);
-                        return;
-                    }
+        this.insertListing(listingId, listingTitle, description, latitude, longitude, location, userId, bookId, (insertListingResponse) => {
+            if (insertListingResponse.success) {
+                
+                Picture.createPicture(picture, insertListingResponse.data.get('listingId'), (createPictureResponse) => {
+                    callback(createPictureResponse);
+                    return;
                 })
 
             } else {
-                callback(getUserIdResponse);
+                callback(insertListingResponse);
                 return;
             }
-        });
+        })
     }
-
-  // static createListing(title, description, dateadded, status, userId, bookId, callback){
-  //   if(User.getUserById(userId) == undefined){
-  //     callback(false);
-  //     return;
-  //   }
-      
-  //   if(Book.getBookById(bookId) == undefined){
-  //     callback(false);
-  //      return;
-  //   }
-     
-  //   db.Listings.push(new Listing(listingsId++, title, description, dateadded, status, userId, bookId))
-  //   callback(true);
-  // }
-
-  // static updateListing(listingId, title, description, dateadded, status, userId, bookId, callback) {
-  //       new db.Listings({ personId: personId })
-	// 		.save({ listingId:listingId, title:title, description:description, dateadded:dateadded, status:status, userId:userId, bookId:bookId }, {patch: true})
-	// 		.then((model) => {
-	// 			if (model == null)
-	// 				callback({ success: false });
-  //               else
-	// 			    callback({ success: true });
-	// 		})
-	// 		.catch((err) => {
-	// 			callback({ success: false });
-	// 		});
-  //   }
 
   static deleteListing(listingId, callback) {
         new db.Listings()
         .where('listingId', listingId)
-        .destroy()
+        .save({status: false}, {patch: true})
         .then(() => {
             callback({success:true});
         })

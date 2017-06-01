@@ -10,6 +10,7 @@ exports.up = function(knex, Promise) {
         table.date('dateadded');
 		table.float('latitude');
 		table.float('longitude');
+        table.string('location');
 		table.boolean('status');
         table.integer('userId')
             .references('personId').inTable('user');
@@ -28,6 +29,5 @@ exports.up = function(knex, Promise) {
 exports.down = function(knex, Promise) {
 	return knex.schema.dropTable('author')
 	.dropTable('listing')
-    .dropTable('book')
-    .dropTable('bookhasgenre');
+    .dropTable('book');
 };

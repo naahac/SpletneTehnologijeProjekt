@@ -44,7 +44,7 @@ let Books = bookshelf.Model.extend({
         return this.belongsTo(Genres, 'genreId');
     },
     listing: function (){
-        return this.hasOne(Listings, 'listingId');
+        return this.hasMany(Listings, 'listingId');
     }
 });
 
