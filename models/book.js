@@ -25,7 +25,7 @@ class Book {
             });
 	}
 
-    static search(title, author, callback) {
+    static booksAutocomplete(title, author, callback) {
         title = '%' + title + '%';
 
         if(author == null){
@@ -56,6 +56,39 @@ class Book {
                 callback({success: false});
             });
         }
+	}
+
+    static search(userId, latitude, longitude, title, callback) {
+        // title = '%' + title + '%';
+
+        // if(author == null){
+        //     new db.Books()
+        //     .where('title', 'LIKE', title)
+        //     .fetchAll({withRelated: ['author']})
+        //     .then((models) => {
+        //         if(models == null)
+        //             callback({success: false});
+        //         else
+        //             callback({success: true, data: models});
+        //     })
+        //     .catch((error) => {
+        //         callback({success: false});
+        //     });
+        // } else{
+        //     new db.Books()
+        //     .query(function(qb) {
+        //         qb.where('title', 'LIKE', title).where('authorId', author);
+        //     }).fetchAll()
+        //     .then((models) => {
+        //         if(models == null)
+        //             callback({success: false});
+        //         else
+        //             callback({success: true, data: models});
+        //     })
+        //     .catch((error) => {
+        //         callback({success: false});
+        //     });
+        // }
 	}
 
     static getBooks(callback) {

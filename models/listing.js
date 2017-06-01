@@ -52,7 +52,7 @@ class Listing {
 
   static getListingsByUserId(userId, callback) {
         new db.Listings()
-        .where({userId: userId, status: true})
+        .where({userId: userId})
         .fetchAll({withRelated: ['book', 'book.author', 'book.genre']})
         .then((models) => {
             if(models == null)

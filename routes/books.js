@@ -94,7 +94,7 @@ router.get('/search', function(req, res, next) {
 				author = req.query.authorId;
 			}		
 
-			Book.search(req.query.title, author, (response) => {
+			Book.booksAutocomplete(req.query.title, author, (response) => {
 				if (!response.success) {
 					res.status(404);
 					res.send({status: 'No books.'});

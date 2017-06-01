@@ -18,12 +18,12 @@ router.post('/login', function (req, res, next) {
                 res.status(404);
                 res.send({success: false, status: 'User not found' });
             }else{
-                Token.login(result.data, (result) => {
-                    if (!result.success) {
+                Token.login(result.data, (loginResponse) => {
+                    if (!loginResponse.success) {
                         res.status(404);
                         res.send({success: false, status: 'Encountered error while logging in' });
                     } else {
-                        res.json(data);
+                        res.json(loginResponse);
                     }
                 });
             }
