@@ -13,6 +13,7 @@ router.get('/', function (req, res, next) {
 		if (!req.query.chatId) {
 			res.status(400);
             res.send({success: false, status: 'Requested data not received!'});
+			return;
 		}
 
 		Chat.getChat(req.query.chatId, (response) => {
@@ -34,6 +35,7 @@ router.get('/id', function (req, res, next) {
 		if (!req.query.userId) {
 			res.status(400);
             res.send({success: false, status: 'Requested data not received!'});
+			return;
 		}
 
 		Chat.getChatId(checkTokenResponse.data.get('personId'), req.query.userId, (response) => {

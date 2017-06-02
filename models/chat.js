@@ -24,13 +24,10 @@ class Chat {
                                 var jsonChat = model.serialize();
                                 var jsonUsers = users.serialize();
 
-                                let firstTime = true;
-
                                 jsonUsers.forEach((user) => {
-                                    if (firstTime) {
+                                    if(jsonChat.user1 == user.personId) {
                                         jsonChat.username1 = user.username;
-                                        firstTime = false;
-                                    } else {
+                                    } else if (jsonChat.user2 == user.personId) {
                                         jsonChat.username2 = user.username;
                                     }
                                 });
