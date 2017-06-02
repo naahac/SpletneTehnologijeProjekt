@@ -39,11 +39,11 @@ router.get('/id', function (req, res, next) {
 		Chat.getChatId(checkTokenResponse.data.get('personId'), req.query.userId, (response) => {
 			if (!response.success) {
 				Chat.createChat( checkTokenResponse.data.get('personId'), req.query.userId, (createChatResponse) => {
-					if(!response.success) {
+					if(!createChatResponse.success) {
 						res.status(404);
 						res.send({success: false, status: 'Error while creating chat' });
 					} else {
-						res.json(response);
+						res.json(createChatResponse);
 					}
 				});
 			} else {
