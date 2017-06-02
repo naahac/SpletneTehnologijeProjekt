@@ -52,8 +52,7 @@ class Chat {
 
 	static getChatsByUserId(userId, callback) {
         new db.Chats()
-        .where({user1: userId})
-		.orWhere({user2: userId})
+        .query({where: {user1: userId}, orWhere: {user2: userId}})
         .fetchAll()
         .then((models) => {
             if(models.length == 0)

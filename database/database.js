@@ -76,7 +76,7 @@ let Chats = bookshelf.Model.extend({
     tableName: 'chat',
     idAttribute: 'chatId',
     message: function (){
-        return this.hasMany(Messages, 'messageId');
+        return this.hasMany(Messages, 'chatId');
     }
 });
 
