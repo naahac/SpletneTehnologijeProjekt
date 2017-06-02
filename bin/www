@@ -35,11 +35,13 @@ var clients = []
 
 var io = require('socket.io').listen(server);
 io.on('connection', function (socket) {
-	socket.on('connect', function (userId) {
+	socket.on('subscribe', function (userId) {
+		console.log("subscribe");
 		clients[userId] = socket.id;
 	});
 
 	socket.on('messageToServer', function (chatId, senderId, receiverId, message) {
+		console.log("messageToServer");
 		if(!chatId || !senderId || !receiverId) {
 			io.to(clients[senderId]).emit('messageToClient', null, chatId);
 		} else {
