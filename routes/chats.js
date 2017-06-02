@@ -60,14 +60,8 @@ router.get('/byuserid', function (req, res, next) {
 
 		Chat.getChatsByUserId(checkTokenResponse.data.get('personId'), (response) => {
 			if (!response.success) {
-				Chat.createChat( checkTokenResponse.data.get('personId'), req.query.userId, (createChatResponse) => {
-					if(!response.success) {
-						res.status(404);
-						res.send({success: false, status: 'Error while creating chat' });
-					} else {
-						res.json(response);
-					}
-				});
+				res.status(404);
+				res.send({success: false, status: 'Error while getting chat list' });
 			} else {
 				res.json(response);
 			}
