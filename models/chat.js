@@ -14,7 +14,36 @@ class Chat {
             if(model == null)
                 callback({success: false});
             else
-                callback({success: true, data: model});
+            {
+                new db.Users()
+                .query({where: {personId: model.get('user1')}, orWhere: {personId: model.get('user2')}})
+                .fetchAll()
+                .then((users) => {
+                    if(users == null)
+                        callback({success: false});
+                    else
+                    {
+                        var jsonChat = model.serialize();
+                        var jsonUsers = users.serialize();
+
+                        let firstTime = true;
+
+                        jsonUsers.forEach((user) => {
+                            if(firstTime) {
+                                jsonChat.username1 = user.username;
+                                firstTime = false;
+                            } else {
+                                jsonChat.username2 = user.username;
+                            }
+                        });
+
+                        callback({success: true, data: jsonChat});
+                    }   
+                })
+                .catch((error) => {
+                    callback({success: false});
+                });
+            }    
         })
         .catch((error) => {
             callback({success: false});
@@ -57,8 +86,43 @@ class Chat {
         .then((models) => {
             if(models.length == 0)
                 callback({success: false});
-            else
+            else {
+                // var jsonChat = model.serialize();
+
+                // new db.Users()
+                // .query({where: {personId: model.get('user1')}, orWhere: {personId: model.get('user2')}})
+                // .fetchAll()
+                // .then((users) => {
+                //     if(users == null)
+                //         callback({success: false});
+                //     else
+                //     {
+                //         var jsonChat = model.serialize();
+                //         var jsonUsers = users.serialize();
+
+                //         let firstTime = true;
+
+                //         jsonUsers.forEach((user) => {
+                //             if(firstTime) {
+                //                 jsonChat.username1 = user.username;
+                //                 firstTime = false;
+                //             } else {
+                //                 jsonChat.username2 = user.username;
+                //             }
+                //         });
+
+                //         callback({success: true, data: jsonChat});
+                //     }   
+                // })
+                // .catch((error) => {
+                //     callback({success: false});
+                // });
+
+
+
                 callback({success: true, data: models});
+            }
+                
         })
         .catch((error) => {
             callback({success: false});

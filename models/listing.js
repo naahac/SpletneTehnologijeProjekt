@@ -136,11 +136,15 @@ class Listing {
                         this.insertListing(listingId, listingTitle, description, latitude, longitude, location, userId, insertBookResponse.data.get('bookId'), (insertListingResponse) => {
                             if (insertListingResponse.success) {
                                 
-                                Picture.createPicture(picture, insertListingResponse.data.get('listingId'), (createPictureResponse) => {
-                                    callback(createPictureResponse);
+                                if(picture == null) {
+                                    callback(insertListingResponse);
                                     return;
-                                })
-
+                                } else {
+                                    Picture.createPicture(picture, insertListingResponse.data.get('listingId'), (createPictureResponse) => {
+                                        callback(createPictureResponse);
+                                        return;
+                                    });
+                                }
                             } else {
                                 callback(insertListingResponse);
                                 return;
@@ -171,12 +175,15 @@ class Listing {
 
         this.insertListing(listingId, listingTitle, description, latitude, longitude, location, userId, bookId, (insertListingResponse) => {
             if (insertListingResponse.success) {
-                
-                Picture.createPicture(picture, insertListingResponse.data.get('listingId'), (createPictureResponse) => {
-                    callback(createPictureResponse);
+                if(picture == null) {
+                    callback(insertListingResponse);
                     return;
-                })
-
+                } else {
+                    Picture.createPicture(picture, insertListingResponse.data.get('listingId'), (createPictureResponse) => {
+                        callback(createPictureResponse);
+                        return;
+                    });
+                }
             } else {
                 callback(insertListingResponse);
                 return;

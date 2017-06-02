@@ -127,10 +127,16 @@ router.put('/', function (req, res, next) {
         if(!checkTokenResponse.success)
             return;
 
-		if (req.body.listingId && req.body.listingTitle && req.body.description && req.body.longitude && req.body.latitude && req.body.location && req.body.picture) {
+		let picture = null;
+
+		if(req.body.picture) {
+			picture = req.body.picture
+		}
+
+		if (req.body.listingId && req.body.listingTitle && req.body.description && req.body.longitude && req.body.latitude && req.body.location) {
 			if(req.body.bookId) {
 				Listing.insertListingWithSavedBook(req.body.listingId, checkTokenResponse.data.get('personId'), req.body.listingTitle, req.body.description,
-					req.body.latitude, req.body.longitude, req.body.location, req.body.picture, req.body.bookId,
+					req.body.latitude, req.body.longitude, req.body.location, picture, req.body.bookId,
 					(response) => {
 						if (!response.success) {
 							res.status(404);
@@ -142,7 +148,7 @@ router.put('/', function (req, res, next) {
 				});
 			} else if (req.body.bookTitle && req.body.author && req.body.genreId) {
 				Listing.insertListingWithNewBook(req.body.listingId, checkTokenResponse.data.get('personId'), req.body.listingTitle, req.body.description,
-					req.body.latitude, req.body.longitude, req.body.location, req.body.picture, req.body.bookTitle, req.body.author, req.body.genreId,
+					req.body.latitude, req.body.longitude, req.body.location, picture, req.body.bookTitle, req.body.author, req.body.genreId,
 					(response) => {
 						if (!response.success) {
 							res.status(404);
