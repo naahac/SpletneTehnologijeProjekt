@@ -32,7 +32,7 @@ router.get('/id', function (req, res, next) {
 		if (!checkTokenResponse.success)
 			return;
 		
-		if (!req.query.userId) {
+		if (!req.query.userId || checkTokenResponse.data.get('personId') == req.query.userId) {
 			res.status(400);
             res.send({success: false, status: 'Requested data not received!'});
 			return;
